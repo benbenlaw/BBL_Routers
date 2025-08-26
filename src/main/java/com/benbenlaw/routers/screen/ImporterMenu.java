@@ -82,7 +82,6 @@ public class ImporterMenu extends AbstractContainerMenu {
             if (slots.get(i) instanceof GhostSlot ghostSlot) {
                 FluidStack fluid = i < fluids.size() ? fluids.get(i) : FluidStack.EMPTY;
                 ghostSlot.setFluid(fluid);
-                System.out.println("Updated slot " + i + " with fluid: " + fluid);
             }
         }
     }

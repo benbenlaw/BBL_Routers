@@ -163,7 +163,6 @@ public class ImporterBlock extends BaseEntityBlock {
                         Component.translatable("block.routers.importer_block")), (buf -> buf.writeBlockPos(blockPos)));
 
                 PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFluidListToClient(blockPos, importer.getFluidFilters()));
-                System.out.println(importer.getFluidFilters());
             }
         }
 
