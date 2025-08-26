@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
-public class RoutersItemTags extends ItemTagsProvider {
+public class RoutersItemTagsProvider extends ItemTagsProvider {
 
-    RoutersItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTags, ExistingFileHelper existingFileHelper) {
+    RoutersItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, BlockTagsProvider blockTags, ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, blockTags.contentsGetter(), Routers.MOD_ID, existingFileHelper);
     }
 

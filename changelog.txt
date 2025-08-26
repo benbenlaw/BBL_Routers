@@ -1,5 +1,8 @@
 Routers
 
+1.0.3
+Added translations, loottable, item tags, block tags and temp models abd recipes
+
 1.0.2
 Improved Syncing of Importer/Exporter
 

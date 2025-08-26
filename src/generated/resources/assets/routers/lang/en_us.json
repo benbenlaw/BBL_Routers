@@ -1,0 +1,14 @@
+{
+  "block.routers.exporter_block": "Exporter",
+  "block.routers.importer_block": "Importer",
+  "item.routers.rf_upgrade_1": "RF Upgrade I",
+  "item.routers.rf_upgrade_2": "RF Upgrade II",
+  "item.routers.rf_upgrade_3": "RF Upgrade III",
+  "item.routers.rf_upgrade_4": "RF Upgrade IV",
+  "item.routers.router_connector": "Connector",
+  "itemGroup.routers": "Routers",
+  "messages.routers.exporter.add_importer": "Added Importer to Exporter",
+  "messages.routers.exporter.remove_importer": "Removed Importer from Exporter",
+  "messages.routers.importer.added_pos": "Added Importer position",
+  "messages.routers.importer.removed_pos": "Removed Importer position"
+}

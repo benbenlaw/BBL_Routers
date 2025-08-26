@@ -1,7 +1,6 @@
 package com.benbenlaw.routers.data;
 
 import com.benbenlaw.routers.Routers;
-import com.benbenlaw.routers.util.RoutersTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -26,25 +25,21 @@ public class DataGenerators {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
 
-        //generator.addProvider(event.includeServer(), new CastingRecipeProvider(packOutput, event.getLookupProvider()));
-//
-        //generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(),
-        //        List.of(new LootTableProvider.SubProviderEntry(CastingLootTableProvider::new, LootContextParamSets.BLOCK)), event.getLookupProvider()));
-//
-//
-        RoutersBlockTags blockTags = new RoutersBlockTags(packOutput, lookupProvider, event.getExistingFileHelper());
+        generator.addProvider(event.includeServer(), new RoutersRecipeProvider(packOutput, event.getLookupProvider()));
+
+        generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(),
+                List.of(new LootTableProvider.SubProviderEntry(RoutersLootTableProvider::new, LootContextParamSets.BLOCK)), event.getLookupProvider()));
+
+
+        RoutersBlockTagsProvider blockTags = new RoutersBlockTagsProvider(packOutput, lookupProvider, event.getExistingFileHelper());
         generator.addProvider(event.includeServer(), blockTags);
 
-        RoutersItemTags itemTags = new RoutersItemTags(packOutput, lookupProvider, blockTags, event.getExistingFileHelper());
+        RoutersItemTagsProvider itemTags = new RoutersItemTagsProvider(packOutput, lookupProvider, blockTags, event.getExistingFileHelper());
         generator.addProvider(event.includeServer(), itemTags);
-//
-        //CastingFluidTags fluidTags = new CastingFluidTags(packOutput, lookupProvider, Casting.MOD_ID, event.getExistingFileHelper());
-        //generator.addProvider(event.includeServer(), fluidTags);
-//
-        //generator.addProvider(event.includeClient(), new CastingItemModelProvider(packOutput, event.getExistingFileHelper()));
-        //generator.addProvider(event.includeClient(), new CastingBlockStatesProvider(packOutput, event.getExistingFileHelper()));
-//
-        //generator.addProvider(event.includeClient(), new CastingLangProvider(packOutput, event.getExistingFileHelper()));
+
+        generator.addProvider(event.includeClient(), new RoutersItemModelsProvider(packOutput, event.getExistingFileHelper()));
+
+        generator.addProvider(event.includeClient(), new RoutersLangProvider(packOutput, event.getExistingFileHelper()));
 
 
 

@@ -1,0 +1,15 @@
+// 1.21.1	2025-08-26T12:58:45.4244019	Recipes
+c1a2678c763af7bfd1eecd1278bc3fd0c14369af data/routers/advancement/recipes/misc/exporter_block.json
+a09a4da001ca2012ba92f06250cd0bcde139ebc6 data/routers/advancement/recipes/misc/importer_block.json
+d64ecb65bf2ebb141814a0cd6ca0da94379c222f data/routers/advancement/recipes/misc/rf_upgrade_1.json
+d39494c2e7660bf6878e4e3c8c23a3ad6bfb3d30 data/routers/advancement/recipes/misc/rf_upgrade_2.json
+da1d23f6df437b57362e1999c34ecd5e79e2bd61 data/routers/advancement/recipes/misc/rf_upgrade_3.json
+8c88a068bbd5e7e0698dad3e0a4828ff612c229c data/routers/advancement/recipes/misc/rf_upgrade_4.json
+21089a5ddaee1b265d3a8c5331999224e53412ca data/routers/advancement/recipes/misc/router_connector.json
+8da8e7e003af8c7360762d2211445f863bc73c70 data/routers/recipe/exporter_block.json
+400556f68553c071fef4fd565de571310ceeaa50 data/routers/recipe/importer_block.json
+86098f9e6d6790dbf31b93071b1db054d26b3247 data/routers/recipe/rf_upgrade_1.json
+a265f045c0a4dfb44fec477258715a91d6963d8b data/routers/recipe/rf_upgrade_2.json
+0df2a9a8e6402a918e8c58d08b24c29913477559 data/routers/recipe/rf_upgrade_3.json
+52daf0b2a716caca72fed3413b0f457ea8352080 data/routers/recipe/rf_upgrade_4.json
+cf3a7255199398514fa8ea6f89b458faeea7786d data/routers/recipe/router_connector.json
