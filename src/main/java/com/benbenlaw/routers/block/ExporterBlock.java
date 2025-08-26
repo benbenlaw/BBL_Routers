@@ -4,11 +4,13 @@ import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
+import com.benbenlaw.routers.networking.packets.SyncFluidListToClient;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
@@ -31,6 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -130,6 +133,17 @@ public class ExporterBlock extends BaseEntityBlock {
     }
 
     @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        if (pState.getBlock() != pNewState.getBlock()) {
+            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+            if (blockEntity instanceof ExporterBlockEntity) {
+                ((ExporterBlockEntity) blockEntity).drops();
+            }
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+    }
+
+    @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult result) {
 
         if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
@@ -152,13 +166,15 @@ public class ExporterBlock extends BaseEntityBlock {
             }
         } else {
             ExporterBlockEntity exporter = (ExporterBlockEntity) level.getBlockEntity(blockPos);
-
             if (exporter instanceof ExporterBlockEntity) {
+
+
                 ContainerData data = exporter.data;
                 player.openMenu(new SimpleMenuProvider(
                         (windowId, playerInventory, playerEntity) -> new ExporterMenu(windowId, playerInventory, blockPos, data),
                         Component.translatable("block.routers.exporter_block")), (buf -> buf.writeBlockPos(blockPos)));
 
+                PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFluidListToClient(blockPos, exporter.getFluidFilters()));
             }
             return ItemInteractionResult.SUCCESS;
 

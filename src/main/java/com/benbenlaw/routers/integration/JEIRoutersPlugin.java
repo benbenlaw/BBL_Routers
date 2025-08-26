@@ -2,6 +2,8 @@ package com.benbenlaw.routers.integration;
 
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.screen.ExporterScreen;
+import com.benbenlaw.routers.screen.ImporterMenu;
+import com.benbenlaw.routers.screen.ImporterScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
@@ -18,7 +20,9 @@ public class JEIRoutersPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGhostIngredientHandler(ExporterScreen.class, new GhostIngredientHandler());
+        registration.addGhostIngredientHandler(ExporterScreen.class, new GhostIngredientExporterHandler());
+        registration.addGhostIngredientHandler(ImporterScreen.class, new GhostIngredientImporterHandler());
+
     }
 
 }

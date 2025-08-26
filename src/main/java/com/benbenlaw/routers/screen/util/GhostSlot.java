@@ -13,6 +13,9 @@ public class GhostSlot extends Slot {
         super(container, index, x, y);
     }
 
+    private ItemStack ghostItem = ItemStack.EMPTY;
+    private FluidStack ghostFluid = FluidStack.EMPTY;
+
     @Override
     public boolean mayPickup(Player player) {
         return false;
@@ -22,4 +25,21 @@ public class GhostSlot extends Slot {
     public boolean mayPlace(ItemStack stack) {
         return false;
     }
+
+
+    public void setItem(ItemStack stack) {
+        this.ghostItem = stack;
+        setChanged();
+    }
+
+    public void setFluid(FluidStack stack) {
+        this.ghostFluid = stack;
+        setChanged();
+    }
+
+    public ItemStack getGhostItem() { return ghostItem; }
+    public FluidStack getGhostFluid() { return ghostFluid; }
+    public boolean hasItem() { return !ghostItem.isEmpty(); }
+    public boolean hasFluid() { return !ghostFluid.isEmpty(); }
+
 }

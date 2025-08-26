@@ -2,7 +2,9 @@ package com.benbenlaw.routers.networking.packets;
 
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
+import com.benbenlaw.routers.block.entity.ImporterBlockEntity;
 import com.benbenlaw.routers.screen.ExporterMenu;
+import com.benbenlaw.routers.screen.ImporterMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -23,6 +25,9 @@ public record JEISyncToMenu(int slot, ItemStack stack) implements CustomPacketPa
         ServerPlayer player = (ServerPlayer) context.player();
 
         if (player.containerMenu instanceof ExporterMenu menu) {
+            menu.filterInventory.setItem(packet.slot, packet.stack);
+        }
+        if (player.containerMenu instanceof ImporterMenu menu) {
             menu.filterInventory.setItem(packet.slot, packet.stack);
         }
 

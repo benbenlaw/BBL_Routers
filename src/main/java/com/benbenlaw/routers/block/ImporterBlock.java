@@ -4,11 +4,13 @@ import com.benbenlaw.routers.block.entity.ImporterBlockEntity;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
+import com.benbenlaw.routers.networking.packets.SyncFluidListToClient;
 import com.benbenlaw.routers.screen.ImporterMenu;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
@@ -31,6 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -131,6 +134,9 @@ public class ImporterBlock extends BaseEntityBlock {
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos blockPos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult result) {
 
+        if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
+
+
         if (stack.is(RoutersItems.ROUTER_CONNECTOR)) {
 
             if (state.getBlock() instanceof ImporterBlock) {
@@ -156,6 +162,8 @@ public class ImporterBlock extends BaseEntityBlock {
                         (windowId, playerInventory, playerEntity) -> new ImporterMenu(windowId, playerInventory, blockPos, data),
                         Component.translatable("block.routers.importer_block")), (buf -> buf.writeBlockPos(blockPos)));
 
+                PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFluidListToClient(blockPos, importer.getFluidFilters()));
+                System.out.println(importer.getFluidFilters());
             }
         }
 

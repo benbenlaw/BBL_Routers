@@ -1,0 +1,7 @@
+Routers
+
+1.0.1
+Added 4 tiers of RF Upgrades, 1 is required to allow the exporter to export RF
+Upgrades are tier 1,2,3 and 4 with 100, 1000, 10,000 and 100,000 RF/t respectively, upgrades are combines eg 2 tier 4 upgrades extract 200,000 RF/t
+Exporter and Import GUIs now split
+Exporter now has upgrade slots

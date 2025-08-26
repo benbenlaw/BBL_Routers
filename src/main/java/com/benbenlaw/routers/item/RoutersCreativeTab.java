@@ -24,6 +24,12 @@ public class RoutersCreativeTab {
                 output.accept(RoutersBlocks.IMPORTER_BLOCK.get().asItem());
                 output.accept(RoutersItems.ROUTER_CONNECTOR.get().asItem());
 
+                output.accept(RoutersItems.RF_UPGRADE_1.get().asItem());
+                output.accept(RoutersItems.RF_UPGRADE_2.get().asItem());
+                output.accept(RoutersItems.RF_UPGRADE_3.get().asItem());
+                output.accept(RoutersItems.RF_UPGRADE_4.get().asItem());
+
+
 
             }).build());
 }

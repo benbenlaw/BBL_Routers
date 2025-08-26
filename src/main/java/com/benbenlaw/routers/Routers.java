@@ -3,6 +3,7 @@ package com.benbenlaw.routers;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
 import com.benbenlaw.routers.integration.RoutersCapabilities;
+import com.benbenlaw.routers.item.RoutersCreativeTab;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
 import com.benbenlaw.routers.networking.RoutersNetworking;
@@ -33,10 +34,9 @@ public class Routers {
         RoutersBlocks.BLOCKS.register(eventBus);
         RoutersBlockEntities.BLOCK_ENTITIES.register(eventBus);
         RoutersMenuTypes.MENUS.register(eventBus);
+        RoutersCreativeTab.CREATIVE_MODE_TABS.register(eventBus);
 
         eventBus.addListener(this::commonSetup);
-
-
     }
 
     public void commonSetup(RegisterPayloadHandlersEvent event) {
@@ -44,7 +44,7 @@ public class Routers {
 
     }
 
-    @EventBusSubscriber(modid = Routers.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = Routers.MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {

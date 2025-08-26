@@ -3,6 +3,7 @@ package com.benbenlaw.routers.block.entity;
 import com.benbenlaw.routers.block.ImporterBlock;
 import com.benbenlaw.routers.integration.RoutersCapabilities;
 import com.benbenlaw.routers.screen.ImporterMenu;
+import com.benbenlaw.routers.screen.util.FluidContainerHelper;
 import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +37,7 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     private IChemicalHandler chemicalHandler;
     public final ContainerData data;
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
+    private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
 
     @Override
     public @NotNull Component getDisplayName() {
@@ -70,6 +73,10 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
 
     public NonNullList<ItemStack> getFilters() {
         return filters;
+    }
+
+    public NonNullList<FluidStack> getFluidFilters() {
+        return fluidFilters;
     }
 
     public void tick() {
@@ -142,6 +149,8 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         super.saveAdditional(compoundTag, provider);
 
         ContainerHelper.saveAllItems(compoundTag, this.filters, provider);
+        FluidContainerHelper.saveAllFluids(compoundTag, this.fluidFilters, true, provider);
+
         if (extractorPos != null) {
             compoundTag.putInt("extractorX", extractorPos.getX());
             compoundTag.putInt("extractorY", extractorPos.getY());
@@ -154,6 +163,8 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         super.loadAdditional(compoundTag, provider);
 
         ContainerHelper.loadAllItems(compoundTag, this.filters, provider);
+        FluidContainerHelper.loadAllFluids(compoundTag, this.fluidFilters, provider);
+
         if (compoundTag.contains("extractorX") && compoundTag.contains("extractorY") && compoundTag.contains("extractorZ")) {
             extractorPos = new BlockPos(compoundTag.getInt("extractorX"), compoundTag.getInt("extractorY"), compoundTag.getInt("extractorZ"));
         } else {
