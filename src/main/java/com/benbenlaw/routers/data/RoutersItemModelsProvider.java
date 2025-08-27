@@ -18,11 +18,31 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
 
-        simpleItem(RoutersItems.ROUTER_CONNECTOR);
+        handheldItem(RoutersItems.ROUTER_CONNECTOR.get());
         simpleItem(RoutersItems.RF_UPGRADE_1);
         simpleItem(RoutersItems.RF_UPGRADE_2);
         simpleItem(RoutersItems.RF_UPGRADE_3);
         simpleItem(RoutersItems.RF_UPGRADE_4);
+
+        simpleItem(RoutersItems.ITEM_UPGRADE_1);
+        simpleItem(RoutersItems.ITEM_UPGRADE_2);
+        simpleItem(RoutersItems.ITEM_UPGRADE_3);
+        simpleItem(RoutersItems.ITEM_UPGRADE_4);
+
+        simpleItem(RoutersItems.FLUID_UPGRADE_1);
+        simpleItem(RoutersItems.FLUID_UPGRADE_2);
+        simpleItem(RoutersItems.FLUID_UPGRADE_3);
+        simpleItem(RoutersItems.FLUID_UPGRADE_4);
+
+        simpleItem(RoutersItems.CHEMICAL_UPGRADE_1);
+        simpleItem(RoutersItems.CHEMICAL_UPGRADE_2);
+        simpleItem(RoutersItems.CHEMICAL_UPGRADE_3);
+        simpleItem(RoutersItems.CHEMICAL_UPGRADE_4);
+
+        simpleItem(RoutersItems.SPEED_UPGRADE_1);
+        simpleItem(RoutersItems.SPEED_UPGRADE_2);
+        simpleItem(RoutersItems.SPEED_UPGRADE_3);
+        simpleItem(RoutersItems.SPEED_UPGRADE_4);
 
     }
 

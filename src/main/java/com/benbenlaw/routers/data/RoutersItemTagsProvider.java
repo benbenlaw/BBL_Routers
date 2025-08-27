@@ -29,6 +29,38 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
                 RoutersItems.RF_UPGRADE_4.get()
         );
 
+        //Item Upgrades
+        this.tag(RoutersTags.Items.ITEM_UPGRADES).add(
+                RoutersItems.ITEM_UPGRADE_1.get(),
+                RoutersItems.ITEM_UPGRADE_2.get(),
+                RoutersItems.ITEM_UPGRADE_3.get(),
+                RoutersItems.ITEM_UPGRADE_4.get()
+        );
+
+        //Fluid Upgrades
+        this.tag(RoutersTags.Items.FLUID_UPGRADES).add(
+                RoutersItems.FLUID_UPGRADE_1.get(),
+                RoutersItems.FLUID_UPGRADE_2.get(),
+                RoutersItems.FLUID_UPGRADE_3.get(),
+                RoutersItems.FLUID_UPGRADE_4.get()
+        );
+
+        //Chemical Upgrades
+        this.tag(RoutersTags.Items.CHEMICAL_UPGRADES).add(
+                RoutersItems.CHEMICAL_UPGRADE_1.get(),
+                RoutersItems.CHEMICAL_UPGRADE_2.get(),
+                RoutersItems.CHEMICAL_UPGRADE_3.get(),
+                RoutersItems.CHEMICAL_UPGRADE_4.get()
+        );
+
+        //Speed Upgrades
+        this.tag(RoutersTags.Items.SPEED_UPGRADES).add(
+                RoutersItems.SPEED_UPGRADE_1.get(),
+                RoutersItems.SPEED_UPGRADE_2.get(),
+                RoutersItems.SPEED_UPGRADE_3.get(),
+                RoutersItems.SPEED_UPGRADE_4.get()
+        );
+
     }
 
 }

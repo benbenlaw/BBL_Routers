@@ -1,8 +1,9 @@
 package com.benbenlaw.routers.block.entity;
 
 import com.benbenlaw.routers.block.ImporterBlock;
+import com.benbenlaw.routers.config.StartupConfig;
 import com.benbenlaw.routers.integration.RoutersCapabilities;
-import com.benbenlaw.routers.item.RFUpgradeItem;
+import com.benbenlaw.routers.item.UpgradeItem;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.benbenlaw.routers.screen.util.FluidContainerHelper;
 import com.benbenlaw.routers.util.RoutersTags;
@@ -20,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -28,6 +30,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -127,160 +130,186 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         assert level != null;
         BlockEntity targetBlockEntity = level.getBlockEntity(targetPos);
         Direction inputDirection = facing.getOpposite();
+        int speedPerOperation = getSpeedPerOperation();
+        IEnergyStorage targetEnergyStorage = Capabilities.EnergyStorage.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
 
-        if (targetBlockEntity != null) {
-            IItemHandler targetItemHandler = Capabilities.ItemHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-            IFluidHandler targetFluidHandler = Capabilities.FluidHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-            IEnergyStorage targetEnergyStorage = Capabilities.EnergyStorage.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-            IChemicalHandler targetChemicalHandler;
+        //Handler Energy on per tick basis - this is to follow standard rf per tick conventions
+        if (targetEnergyStorage != null && hasUpgrade(RoutersTags.Items.RF_UPGRADES)) {
+            int maxTransfer = getExtractAmount(RoutersTags.Items.RF_UPGRADES);
 
-            if (ModList.get().isLoaded("mekanism")) {
-                targetChemicalHandler = RoutersCapabilities.CHEMICAL_HANDLER.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-            } else {
-                targetChemicalHandler = null;
+            for (BlockPos importerPos : importerPositions) {
+                BlockEntity be = level.getBlockEntity(importerPos);
+                if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                IEnergyStorage importerEnergy = importer.getEnergyStorage();
+                if (importerEnergy == null) continue;
+
+
+                int canReceive = importerEnergy.receiveEnergy(maxTransfer, true);
+                int canExtract = targetEnergyStorage.extractEnergy(maxTransfer, true);
+                int transferAmount = Math.min(canReceive, canExtract);
+                if (transferAmount > 0) {
+                    targetEnergyStorage.extractEnergy(transferAmount, false);
+                    importerEnergy.receiveEnergy(transferAmount, false);
+                    maxTransfer -= transferAmount;
+                }
             }
+        }
 
-            if (targetItemHandler != null) {
-                NonNullList<ItemStack> exporterFilters = getFilters();
+        //Handlers items, fluids, chemicals on speedPerOperation basis
+        if (level.getGameTime() % speedPerOperation == 0) {
 
-                for (int slot = 0; slot < targetItemHandler.getSlots(); slot++) {
-                    ItemStack extracted = targetItemHandler.extractItem(slot, 1, true); // simulate
-                    if (extracted.isEmpty()) continue;
+            if (targetBlockEntity != null) {
+                IItemHandler targetItemHandler = Capabilities.ItemHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+                IFluidHandler targetFluidHandler = Capabilities.FluidHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+                IChemicalHandler targetChemicalHandler;
 
-                    boolean allowByExporter = exporterFilters.stream().allMatch(ItemStack::isEmpty) ||
-                            exporterFilters.stream().anyMatch(f -> !f.isEmpty() && ItemStack.isSameItemSameComponents(f, extracted));
+                if (ModList.get().isLoaded("mekanism")) {
+                    targetChemicalHandler = RoutersCapabilities.CHEMICAL_HANDLER.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+                } else {
+                    targetChemicalHandler = null;
+                }
 
-                    if (!allowByExporter) continue;
+                if (targetItemHandler != null && hasUpgrade(RoutersTags.Items.ITEM_UPGRADES)) {
+                    NonNullList<ItemStack> exporterFilters = getFilters();
+                    int maxTransfer = getExtractAmount(RoutersTags.Items.ITEM_UPGRADES);
 
-                    for (BlockPos importerPos : importerPositions) {
-                        BlockEntity be = level.getBlockEntity(importerPos);
-                        if (!(be instanceof ImporterBlockEntity importer)) continue;
+                    for (int slot = 0; slot < targetItemHandler.getSlots(); slot++) {
+                        ItemStack extracted = targetItemHandler.extractItem(slot, maxTransfer, true); // simulate
+                        if (extracted.isEmpty()) continue;
 
-                        IItemHandler importerHandler = importer.getTargetHandler();
-                        if (importerHandler == null) continue;
+                        boolean allowByExporter = exporterFilters.stream().allMatch(ItemStack::isEmpty) ||
+                                exporterFilters.stream().anyMatch(f -> !f.isEmpty() && ItemStack.isSameItemSameComponents(f, extracted));
 
-                        NonNullList<ItemStack> importerFilters = importer.getFilters();
+                        if (!allowByExporter) continue;
 
-                        boolean allowByImporter = importerFilters.stream().allMatch(ItemStack::isEmpty) ||
-                                importerFilters.stream().anyMatch(f -> !f.isEmpty() && ItemStack.isSameItemSameComponents(f, extracted));
+                        for (BlockPos importerPos : importerPositions) {
+                            BlockEntity be = level.getBlockEntity(importerPos);
+                            if (!(be instanceof ImporterBlockEntity importer)) continue;
 
-                        if (!allowByImporter) continue;
+                            IItemHandler importerHandler = importer.getTargetHandler();
+                            if (importerHandler == null) continue;
 
-                        ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
-                        int inserted = extracted.getCount() - remainder.getCount();
+                            NonNullList<ItemStack> importerFilters = importer.getFilters();
 
-                        if (inserted > 0) {
-                            targetItemHandler.extractItem(slot, inserted, false);
+                            boolean allowByImporter = importerFilters.stream().allMatch(ItemStack::isEmpty) ||
+                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() && ItemStack.isSameItemSameComponents(f, extracted));
+
+                            if (!allowByImporter) continue;
+
+                            ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
+                            int inserted = extracted.getCount() - remainder.getCount();
+
+                            if (inserted > 0) {
+                                targetItemHandler.extractItem(slot, inserted, false);
+                                return;
+                            }
+
+                        }
+                    }
+                }
+
+                if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
+                    NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
+
+                    for (int slot = 0; slot < targetFluidHandler.getTanks(); slot++) {
+
+                        int maxTransfer = getExtractAmount(RoutersTags.Items.FLUID_UPGRADES); // tweak or upgrade value
+
+                        FluidStack simulatedDrain = targetFluidHandler.drain(maxTransfer, IFluidHandler.FluidAction.SIMULATE);
+                        if (simulatedDrain.isEmpty()) continue;
+
+                        boolean allowByExporter = exporterFluidFilters.stream().allMatch(FluidStack::isEmpty) ||
+                                exporterFluidFilters.stream().anyMatch(f -> !f.isEmpty() && FluidStack.isSameFluidSameComponents(f, simulatedDrain));
+
+                        if (!allowByExporter) continue;
+
+                        for (BlockPos importerPos : importerPositions) {
+                            BlockEntity be = level.getBlockEntity(importerPos);
+                            if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                            IFluidHandler importerFluid = importer.getFluidHandler();
+                            if (importerFluid == null) continue;
+
+                            NonNullList<FluidStack> importerFilters = importer.getFluidFilters();
+                            boolean allowByImporter = importerFilters.stream().allMatch(FluidStack::isEmpty) ||
+                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() && FluidStack.isSameFluidSameComponents(f, simulatedDrain));
+                            if (!allowByImporter) continue;
+                            int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
+                            if (canReceive <= 0) continue;
+                            FluidStack extracted = targetFluidHandler.drain(canReceive, IFluidHandler.FluidAction.EXECUTE);
+                            importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
                             return;
                         }
                     }
                 }
-            }
 
-            if (targetFluidHandler != null) {
-                NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
 
-                for (int slot = 0; slot < targetFluidHandler.getTanks(); slot++) {
-
-                    int maxTransfer = 100; // tweak or upgrade value
-
-                    FluidStack simulatedDrain = targetFluidHandler.drain(maxTransfer, IFluidHandler.FluidAction.SIMULATE);
-                    if (simulatedDrain.isEmpty()) continue;
-
-                    boolean allowByExporter = exporterFluidFilters.stream().allMatch(FluidStack::isEmpty) ||
-                            exporterFluidFilters.stream().anyMatch(f -> !f.isEmpty() && FluidStack.isSameFluidSameComponents(f, simulatedDrain));
-
-                    if (!allowByExporter) continue;
-
+                if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
                     for (BlockPos importerPos : importerPositions) {
                         BlockEntity be = level.getBlockEntity(importerPos);
                         if (!(be instanceof ImporterBlockEntity importer)) continue;
 
-                        IFluidHandler importerFluid = importer.getFluidHandler();
-                        if (importerFluid == null) continue;
+                        IChemicalHandler importerChemical = importer.getChemicalHandler();
+                        if (importerChemical == null) continue;
 
-                        NonNullList<FluidStack> importerFilters = importer.getFluidFilters();
-                        boolean allowByImporter = importerFilters.stream().allMatch(FluidStack::isEmpty) ||
-                                importerFilters.stream().anyMatch(f -> !f.isEmpty() && FluidStack.isSameFluidSameComponents(f, simulatedDrain));
-                        if (!allowByImporter) continue;
-                        int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
-                        if (canReceive <= 0) continue;
-                        FluidStack extracted = targetFluidHandler.drain(canReceive, IFluidHandler.FluidAction.EXECUTE);
-                        importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
-                        return;
+                        int maxTransfer = getExtractAmount(RoutersTags.Items.CHEMICAL_UPGRADES);
+
+                        for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
+                            ChemicalStack stackInTank = targetChemicalHandler.getChemicalInTank(tank);
+                            if (stackInTank.isEmpty()) continue;
+
+                            ChemicalStack toExtract = stackInTank.copy();
+                            toExtract.setAmount(Math.min(stackInTank.getAmount(), maxTransfer));
+
+                            ChemicalStack remainder = importerChemical.insertChemical(toExtract, Action.SIMULATE);
+                            long insertedAmount = toExtract.getAmount() - remainder.getAmount();
+                            if (insertedAmount <= 0) continue;
+
+                            ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
+                            importerChemical.insertChemical(extracted, Action.EXECUTE);
+
+                            break;
+                        }
                     }
                 }
+
             }
+        }
 
-            if (targetEnergyStorage != null && hasRFUpgrade()) {
-                for (BlockPos importerPos : importerPositions) {
-                    BlockEntity be = level.getBlockEntity(importerPos);
-                    if (!(be instanceof ImporterBlockEntity importer)) continue;
+    }
 
-                    IEnergyStorage importerEnergy = importer.getEnergyStorage();
-                    if (importerEnergy == null) continue;
-
-                    int maxTransfer = getRFExtractAmount();
-
-                    int canReceive = importerEnergy.receiveEnergy(maxTransfer, true);
-                    int canExtract = targetEnergyStorage.extractEnergy(maxTransfer, true);
-                    int transferAmount = Math.min(canReceive, canExtract);
-                    if (transferAmount > 0) {
-                        targetEnergyStorage.extractEnergy(transferAmount, false);
-                        importerEnergy.receiveEnergy(transferAmount, false);
-                        break;
-                    }
+    public int getSpeedPerOperation() {
+        if (hasUpgrade(RoutersTags.Items.SPEED_UPGRADES)) {
+            int speed = 0;
+            for (int i = 0; i < itemHandler.getSlots(); i++) {
+                ItemStack stack = itemHandler.getStackInSlot(i);
+                if (!stack.isEmpty() && stack.is(RoutersTags.Items.SPEED_UPGRADES) && stack.getItem() instanceof UpgradeItem upgradeItem) {
+                    speed += upgradeItem.getExtractAmount();
+                    break;
                 }
             }
-
-            if (targetChemicalHandler != null) {
-                for (BlockPos importerPos : importerPositions) {
-                    BlockEntity be = level.getBlockEntity(importerPos);
-                    if (!(be instanceof ImporterBlockEntity importer)) continue;
-
-                    IChemicalHandler importerChemical = importer.getChemicalHandler();
-                    if (importerChemical == null) continue;
-
-                    int maxTransfer = 100; // tweak or upgrade value
-
-                    for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
-                        ChemicalStack stackInTank = targetChemicalHandler.getChemicalInTank(tank);
-                        if (stackInTank.isEmpty()) continue;
-
-                        ChemicalStack toExtract = stackInTank.copy();
-                        toExtract.setAmount(Math.min(stackInTank.getAmount(), maxTransfer));
-
-                        ChemicalStack remainder = importerChemical.insertChemical(toExtract, Action.SIMULATE);
-                        long insertedAmount = toExtract.getAmount() - remainder.getAmount();
-                        if (insertedAmount <= 0) continue;
-
-                        ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
-                        importerChemical.insertChemical(extracted, Action.EXECUTE);
-
-                        break;
-                    }
-                }
-            }
-
+            return speed;
+        } else {
+            return StartupConfig.defaultSpeedPerOperation.get();
         }
     }
 
-    public boolean hasRFUpgrade() {
+    public boolean hasUpgrade(TagKey<Item> tag) {
         for (int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack stack = itemHandler.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof RFUpgradeItem) {
+            if (!stack.isEmpty() && stack.is(tag))
                 return true;
             }
-        }
         return false;
     }
 
-    public int getRFExtractAmount() {
+    public int getExtractAmount(TagKey<Item> tag) {
         int total = 0;
         for (int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack stack = itemHandler.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof RFUpgradeItem upgradeItem) {
-                total += upgradeItem.getRFPerTick();
+            if (!stack.isEmpty() && stack.is(tag) && stack.getItem() instanceof UpgradeItem upgradeItem) {
+                total += upgradeItem.getExtractAmount();
             }
         }
         return total;

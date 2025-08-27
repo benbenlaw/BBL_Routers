@@ -11,6 +11,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -103,6 +104,198 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .define('C', Items.NETHERITE_SCRAP)
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.REDSTONE))
+                .save(consumer);
+
+        //Item Upgrade 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.ITEM_UPGRADE_1.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.COPPER_INGOT)
+                .define('B', Items.IRON_INGOT)
+                .define('C', Items.IRON_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.IRON_INGOT))
+                .save(consumer);
+
+        //Item Upgrade 2
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.ITEM_UPGRADE_2.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.IRON_INGOT)
+                .define('B', Items.GOLD_INGOT)
+                .define('C', Items.GOLD_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.GOLD_INGOT))
+                .save(consumer);
+
+        //Item Upgrade 3
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.ITEM_UPGRADE_3.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.GOLD_INGOT)
+                .define('B', Items.DIAMOND)
+                .define('C', Items.EMERALD)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.DIAMOND))
+                .save(consumer);
+
+        //Item Upgrade 4
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.ITEM_UPGRADE_4.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.DIAMOND)
+                .define('B', Items.NETHERITE_INGOT)
+                .define('C', Items.NETHERITE_SCRAP)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.NETHERITE_INGOT))
+                .save(consumer);
+
+        //Fluid Upgrade 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.FLUID_UPGRADE_1.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.COPPER_INGOT)
+                .define('B', Items.BUCKET)
+                .define('C', Items.IRON_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.BUCKET))
+                .save(consumer);
+
+        //Fluid Upgrade 2
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.FLUID_UPGRADE_2.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.IRON_INGOT)
+                .define('B', Items.BUCKET)
+                .define('C', Items.GOLD_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.BUCKET))
+                .save(consumer);
+
+        //Fluid Upgrade 3
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.FLUID_UPGRADE_3.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.GOLD_INGOT)
+                .define('B', Items.BUCKET)
+                .define('C', Items.EMERALD)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.BUCKET))
+                .save(consumer);
+
+        //Fluid Upgrade 4
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.FLUID_UPGRADE_4.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.DIAMOND)
+                .define('B', Items.BUCKET)
+                .define('C', Items.NETHERITE_SCRAP)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.BUCKET))
+                .save(consumer);
+
+        //Chemical Upgrade 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_1.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.GLASS)
+                .define('B', Items.IRON_INGOT)
+                .define('C', Items.IRON_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.GLASS))
+                .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
+
+        //Chemical Upgrade 2
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_2.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.GLASS)
+                .define('B', Items.GOLD_INGOT)
+                .define('C', Items.GOLD_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.GLASS))
+                .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
+
+        //Chemical Upgrade 3
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_3.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.GLASS)
+                .define('B', Items.DIAMOND)
+                .define('C', Items.EMERALD)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.GLASS))
+                .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
+
+        //Chemical Upgrade 4
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_4.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.GLASS)
+                .define('B', Items.NETHERITE_INGOT)
+                .define('C', Items.NETHERITE_SCRAP)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.GLASS))
+                .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
+
+        //Speed Upgrade 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SPEED_UPGRADE_1.get())
+                .pattern(" C ")
+                .pattern("ABA")
+                .pattern(" C ")
+                .define('A', Items.REDSTONE)
+                .define('B', Items.SUGAR)
+                .define('C', Items.IRON_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.SUGAR))
+                .save(consumer);
+
+        //Speed Upgrade 2
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SPEED_UPGRADE_2.get())
+                .pattern(" C ")
+                .pattern("ABA")
+                .pattern(" C ")
+                .define('A', Items.REDSTONE)
+                .define('B', Items.SUGAR)
+                .define('C', Items.GOLD_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.SUGAR))
+                .save(consumer);
+
+        //Speed Upgrade 3
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SPEED_UPGRADE_3.get())
+                .pattern(" C ")
+                .pattern("ABA")
+                .pattern(" C ")
+                .define('A', Items.REDSTONE)
+                .define('B', Items.SUGAR)
+                .define('C', Items.EMERALD)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.SUGAR))
+                .save(consumer);
+
+        //Speed Upgrade 4
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SPEED_UPGRADE_4.get())
+                .pattern(" C ")
+                .pattern("ABA")
+                .pattern(" C ")
+                .define('A', Items.REDSTONE)
+                .define('B', Items.SUGAR)
+                .define('C', Items.NETHERITE_SCRAP)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.SUGAR))
                 .save(consumer);
     }
 

@@ -1,5 +1,11 @@
 Routers
 
+1.0.4
+Exporter no longer extracts anything unless it has the correct upgrade
+Added Item, Fluid, Chemical and Speed Upgrades for the Exporter
+Texture are WIP
+Moved config to BBL folder
+
 1.0.3
 Added translations, loottable, item tags, block tags and temp models abd recipes
 

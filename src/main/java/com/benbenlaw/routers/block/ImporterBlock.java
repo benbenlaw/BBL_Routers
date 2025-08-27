@@ -143,11 +143,11 @@ public class ImporterBlock extends BaseEntityBlock {
 
                 BlockPos savedPos = stack.get(RoutersDataComponents.IMPORTER_POSITION);
                 if (savedPos != null && savedPos.equals(blockPos)) {
-                    player.displayClientMessage(Component.translatable("message.routers.import.removed_pos"), true);
+                    player.displayClientMessage(Component.translatable("message.routers.importer.removed_pos"), true);
                     stack.remove(RoutersDataComponents.IMPORTER_POSITION);
                 } else {
                     stack.set(RoutersDataComponents.IMPORTER_POSITION, blockPos);
-                    player.displayClientMessage(Component.translatable("message.routers.import.added_pos"), true);
+                    player.displayClientMessage(Component.translatable("message.routers.importer.added_pos"), true);
                 }
 
             } else {
