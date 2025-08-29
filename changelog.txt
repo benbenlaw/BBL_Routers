@@ -1,5 +1,14 @@
 Routers
 
+1.0.5
+Fixed Tooltips not displaying for fluids and item that are in the filter
+Slightly improved tick of exporter
+Added Shift information for the Connector, Importer and Exporter to better explain how they work
+Added Round Robin Upgrade, when installed the exporter will cycle in order of importers and import to one per operation.
+Round Robin Upgrade works with Items, Fluids, Chemicals and Energy
+Updated all textures thanks @Yuki
+Now Auto updating to Modrinth
+
 1.0.4
 Exporter no longer extracts anything unless it has the correct upgrade
 Added Item, Fluid, Chemical and Speed Upgrades for the Exporter

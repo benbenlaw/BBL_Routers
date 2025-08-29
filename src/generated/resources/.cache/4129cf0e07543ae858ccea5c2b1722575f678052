@@ -1,4 +1,4 @@
-// 1.21.1	2025-08-27T14:14:19.5231188	routers Item Models
+// 1.21.1	2025-08-28T18:41:30.4181623	routers Item Models
 cdc169fc04bad0ed1b2baa163e5f5e710448386a assets/routers/models/item/chemical_upgrade_1.json
 afc620126a6c7afbe059c37f12b9059a71dd1015 assets/routers/models/item/chemical_upgrade_2.json
 daa142f7dba4a890b2a522b16a464943a0e5e318 assets/routers/models/item/chemical_upgrade_3.json
@@ -15,6 +15,7 @@ cc1e725d3e9e9929b220c242d7fc394a47bb1a48 assets/routers/models/item/rf_upgrade_1
 0778bb8ae365732e778d1a318c21534e746665cd assets/routers/models/item/rf_upgrade_2.json
 fd236305d78ab5274c66ce85a026964ac36b9d57 assets/routers/models/item/rf_upgrade_3.json
 26cb8b66d231f94041d9c0758f77b166db924624 assets/routers/models/item/rf_upgrade_4.json
+94fe2585380221940ff416c23bb786cf65fc4822 assets/routers/models/item/round_robin_upgrade.json
 3a388cc80f5d7d571152074ce220b53d05979a1e assets/routers/models/item/router_connector.json
 39e7c7eca5136982914f9ae4a0105f4425425103 assets/routers/models/item/speed_upgrade_1.json
 f3893b2212ebbfb953c033304283cc94de2d7a43 assets/routers/models/item/speed_upgrade_2.json

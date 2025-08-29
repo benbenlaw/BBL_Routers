@@ -53,15 +53,7 @@ public class ExporterMenu extends AbstractContainerMenu {
         // Ghost slots for filters
         for (int row = 0; row < 2; row++) {
             for (int col = 0; col < 9; col++) {
-                int index = col + row * 9;
-                GhostSlot slot = new GhostSlot(filterInventory, index, 8 + col * 18, 18 + row * 18);
-
-                if (blockEntity.getFluidFilters().size() > index) {
-                    FluidStack fluid = blockEntity.getFluidFilters().get(index);
-                    if (!fluid.isEmpty()) {
-                        slot.setFluid(fluid);
-                    }
-                }
+                GhostSlot slot = getGhostSlot(col, row);
 
                 this.addSlot(slot);
             }
@@ -75,6 +67,26 @@ public class ExporterMenu extends AbstractContainerMenu {
         // Add player inventory and hotbar
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
+    }
+
+    private @NotNull GhostSlot getGhostSlot(int col, int row) {
+        int index = col + row * 9;
+        GhostSlot slot = new GhostSlot(filterInventory, index, 8 + col * 18, 18 + row * 18);
+
+        if (blockEntity.getFluidFilters().size() > index) {
+            FluidStack fluid = blockEntity.getFluidFilters().get(index);
+            if (!fluid.isEmpty()) {
+                slot.setFluid(fluid);
+            }
+        }
+
+        if (blockEntity.getFilters().size() > index) {
+            ItemStack item = blockEntity.getFilters().get(index);
+            if (!item.isEmpty()) {
+                slot.setItem(item);
+            }
+        }
+        return slot;
     }
 
     public BlockPos getBlockPos() {

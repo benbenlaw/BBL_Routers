@@ -297,6 +297,18 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.SUGAR))
                 .save(consumer);
+
+        //Round Robin Upgrade
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.ROUND_ROBIN_UPGRADE.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.COPPER_INGOT)
+                .define('B', Items.REDSTONE)
+                .define('C', Items.IRON_NUGGET)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.REDSTONE))
+                .save(consumer);
     }
 
 }

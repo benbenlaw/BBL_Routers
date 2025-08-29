@@ -83,4 +83,29 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
         guiGraphics.blit(x, y, 0, width, height, sprite);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
+
+    @Override
+    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.renderTooltip(guiGraphics, mouseX, mouseY);
+
+        for (Slot slot : menu.slots) {
+            if (slot instanceof GhostSlot ghostSlot && isHovering(slot, mouseX, mouseY)) {
+                ItemStack stack = ghostSlot.getItem();
+                if (!stack.isEmpty()) {
+                    guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
+                }
+
+                // For fluid ghost slots
+                if (ghostSlot.hasFluid() && !ghostSlot.getGhostFluid().isEmpty()) {
+                    Component fluidName = ghostSlot.getGhostFluid().getHoverName();
+                    guiGraphics.renderTooltip(font, fluidName, mouseX, mouseY);
+                }
+            }
+        }
+    }
+
+    private boolean isHovering(Slot slot, double mouseX, double mouseY) {
+        return mouseX >= leftPos + slot.x && mouseX < leftPos + slot.x + 16
+                && mouseY >= topPos + slot.y && mouseY < topPos + slot.y + 16;
+    }
 }

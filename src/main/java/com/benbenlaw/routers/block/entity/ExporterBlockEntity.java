@@ -124,6 +124,8 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         }
     }
 
+    private int lastRoundRobinIndex = 0;
+
     public void tick() {
         Direction facing = this.getBlockState().getValue(ImporterBlock.FACING);
         BlockPos targetPos = worldPosition.relative(facing);
@@ -131,58 +133,108 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         BlockEntity targetBlockEntity = level.getBlockEntity(targetPos);
         Direction inputDirection = facing.getOpposite();
         int speedPerOperation = getSpeedPerOperation();
-        IEnergyStorage targetEnergyStorage = Capabilities.EnergyStorage.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+        IEnergyStorage targetEnergyStorage = Capabilities.EnergyStorage.BLOCK.getCapability(
+                level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
 
-        //Handler Energy on per tick basis - this is to follow standard rf per tick conventions
+        // --- Energy ---
         if (targetEnergyStorage != null && hasUpgrade(RoutersTags.Items.RF_UPGRADES)) {
             int maxTransfer = getExtractAmount(RoutersTags.Items.RF_UPGRADES);
 
-            for (BlockPos importerPos : importerPositions) {
-                BlockEntity be = level.getBlockEntity(importerPos);
-                if (!(be instanceof ImporterBlockEntity importer)) continue;
+            if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                if (!importerPositions.isEmpty()) {
+                    int index = lastRoundRobinIndex % importerPositions.size();
+                    BlockPos importerPos = importerPositions.get(index);
+                    BlockEntity be = level.getBlockEntity(importerPos);
+                    if (be instanceof ImporterBlockEntity importer) {
+                        IEnergyStorage importerEnergy = importer.getEnergyStorage();
+                        if (importerEnergy != null) {
+                            int canReceive = importerEnergy.receiveEnergy(maxTransfer, true);
+                            int canExtract = targetEnergyStorage.extractEnergy(maxTransfer, true);
+                            int transferAmount = Math.min(canReceive, canExtract);
+                            if (transferAmount > 0) {
+                                targetEnergyStorage.extractEnergy(transferAmount, false);
+                                importerEnergy.receiveEnergy(transferAmount, false);
+                                lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                return;
+                            }
+                        }
+                    }
+                    // even if failed, still advance index to keep cycle consistent
+                    lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                }
+            } else {
+                for (BlockPos importerPos : importerPositions) {
+                    BlockEntity be = level.getBlockEntity(importerPos);
+                    if (!(be instanceof ImporterBlockEntity importer)) continue;
 
-                IEnergyStorage importerEnergy = importer.getEnergyStorage();
-                if (importerEnergy == null) continue;
+                    IEnergyStorage importerEnergy = importer.getEnergyStorage();
+                    if (importerEnergy == null) continue;
 
-
-                int canReceive = importerEnergy.receiveEnergy(maxTransfer, true);
-                int canExtract = targetEnergyStorage.extractEnergy(maxTransfer, true);
-                int transferAmount = Math.min(canReceive, canExtract);
-                if (transferAmount > 0) {
-                    targetEnergyStorage.extractEnergy(transferAmount, false);
-                    importerEnergy.receiveEnergy(transferAmount, false);
-                    maxTransfer -= transferAmount;
+                    int canReceive = importerEnergy.receiveEnergy(maxTransfer, true);
+                    int canExtract = targetEnergyStorage.extractEnergy(maxTransfer, true);
+                    int transferAmount = Math.min(canReceive, canExtract);
+                    if (transferAmount > 0) {
+                        targetEnergyStorage.extractEnergy(transferAmount, false);
+                        importerEnergy.receiveEnergy(transferAmount, false);
+                        maxTransfer -= transferAmount;
+                    }
                 }
             }
         }
 
-        //Handlers items, fluids, chemicals on speedPerOperation basis
-        if (level.getGameTime() % speedPerOperation == 0) {
 
-            if (targetBlockEntity != null) {
-                IItemHandler targetItemHandler = Capabilities.ItemHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-                IFluidHandler targetFluidHandler = Capabilities.FluidHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-                IChemicalHandler targetChemicalHandler;
+        // --- Items / Fluids / Chemicals on operation tick ---
+        if (level.getGameTime() % speedPerOperation == 0 && targetBlockEntity != null) {
+            IItemHandler targetItemHandler = Capabilities.ItemHandler.BLOCK.getCapability(
+                    level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+            IFluidHandler targetFluidHandler = Capabilities.FluidHandler.BLOCK.getCapability(
+                    level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+            IChemicalHandler targetChemicalHandler = ModList.get().isLoaded("mekanism")
+                    ? RoutersCapabilities.CHEMICAL_HANDLER.getCapability(
+                    level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection)
+                    : null;
 
-                if (ModList.get().isLoaded("mekanism")) {
-                    targetChemicalHandler = RoutersCapabilities.CHEMICAL_HANDLER.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
-                } else {
-                    targetChemicalHandler = null;
-                }
+            // --- Items ---
+            if (targetItemHandler != null && hasUpgrade(RoutersTags.Items.ITEM_UPGRADES)) {
+                NonNullList<ItemStack> exporterFilters = getFilters();
+                int maxTransfer = getExtractAmount(RoutersTags.Items.ITEM_UPGRADES);
 
-                if (targetItemHandler != null && hasUpgrade(RoutersTags.Items.ITEM_UPGRADES)) {
-                    NonNullList<ItemStack> exporterFilters = getFilters();
-                    int maxTransfer = getExtractAmount(RoutersTags.Items.ITEM_UPGRADES);
+                for (int slot = 0; slot < targetItemHandler.getSlots(); slot++) {
+                    ItemStack extracted = targetItemHandler.extractItem(slot, maxTransfer, true);
+                    if (extracted.isEmpty()) continue;
 
-                    for (int slot = 0; slot < targetItemHandler.getSlots(); slot++) {
-                        ItemStack extracted = targetItemHandler.extractItem(slot, maxTransfer, true); // simulate
-                        if (extracted.isEmpty()) continue;
+                    boolean allowByExporter = exporterFilters.stream().allMatch(ItemStack::isEmpty) ||
+                            exporterFilters.stream().anyMatch(f -> !f.isEmpty() &&
+                                    ItemStack.isSameItemSameComponents(f, extracted));
+                    if (!allowByExporter) continue;
 
-                        boolean allowByExporter = exporterFilters.stream().allMatch(ItemStack::isEmpty) ||
-                                exporterFilters.stream().anyMatch(f -> !f.isEmpty() && ItemStack.isSameItemSameComponents(f, extracted));
+                    if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                        if (!importerPositions.isEmpty()) {
+                            int index = lastRoundRobinIndex % importerPositions.size();
+                            BlockPos importerPos = importerPositions.get(index);
+                            BlockEntity be = level.getBlockEntity(importerPos);
+                            if (be instanceof ImporterBlockEntity importer) {
+                                IItemHandler importerHandler = importer.getTargetHandler();
+                                if (importerHandler != null) {
+                                    NonNullList<ItemStack> importerFilters = importer.getFilters();
+                                    boolean allowByImporter = importerFilters.stream().allMatch(ItemStack::isEmpty) ||
+                                            importerFilters.stream().anyMatch(f -> !f.isEmpty() &&
+                                                    ItemStack.isSameItemSameComponents(f, extracted));
 
-                        if (!allowByExporter) continue;
-
+                                    if (allowByImporter) {
+                                        ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
+                                        int inserted = extracted.getCount() - remainder.getCount();
+                                        if (inserted > 0) {
+                                            targetItemHandler.extractItem(slot, inserted, false);
+                                            lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                        }
+                    } else {
                         for (BlockPos importerPos : importerPositions) {
                             BlockEntity be = level.getBlockEntity(importerPos);
                             if (!(be instanceof ImporterBlockEntity importer)) continue;
@@ -191,39 +243,62 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                             if (importerHandler == null) continue;
 
                             NonNullList<ItemStack> importerFilters = importer.getFilters();
-
                             boolean allowByImporter = importerFilters.stream().allMatch(ItemStack::isEmpty) ||
-                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() && ItemStack.isSameItemSameComponents(f, extracted));
-
+                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() &&
+                                            ItemStack.isSameItemSameComponents(f, extracted));
                             if (!allowByImporter) continue;
 
                             ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
                             int inserted = extracted.getCount() - remainder.getCount();
-
                             if (inserted > 0) {
                                 targetItemHandler.extractItem(slot, inserted, false);
                                 return;
                             }
-
                         }
                     }
                 }
+            }
 
-                if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
-                    NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
+            // --- Fluids ---
+            if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
+                NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
 
-                    for (int slot = 0; slot < targetFluidHandler.getTanks(); slot++) {
+                for (int slot = 0; slot < targetFluidHandler.getTanks(); slot++) {
+                    int maxTransfer = getExtractAmount(RoutersTags.Items.FLUID_UPGRADES);
+                    FluidStack simulatedDrain = targetFluidHandler.drain(maxTransfer, IFluidHandler.FluidAction.SIMULATE);
+                    if (simulatedDrain.isEmpty()) continue;
 
-                        int maxTransfer = getExtractAmount(RoutersTags.Items.FLUID_UPGRADES); // tweak or upgrade value
+                    boolean allowByExporter = exporterFluidFilters.stream().allMatch(FluidStack::isEmpty) ||
+                            exporterFluidFilters.stream().anyMatch(f -> !f.isEmpty() &&
+                                    FluidStack.isSameFluidSameComponents(f, simulatedDrain));
+                    if (!allowByExporter) continue;
 
-                        FluidStack simulatedDrain = targetFluidHandler.drain(maxTransfer, IFluidHandler.FluidAction.SIMULATE);
-                        if (simulatedDrain.isEmpty()) continue;
-
-                        boolean allowByExporter = exporterFluidFilters.stream().allMatch(FluidStack::isEmpty) ||
-                                exporterFluidFilters.stream().anyMatch(f -> !f.isEmpty() && FluidStack.isSameFluidSameComponents(f, simulatedDrain));
-
-                        if (!allowByExporter) continue;
-
+                    if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                        if (!importerPositions.isEmpty()) {
+                            int index = lastRoundRobinIndex % importerPositions.size();
+                            BlockPos importerPos = importerPositions.get(index);
+                            BlockEntity be = level.getBlockEntity(importerPos);
+                            if (be instanceof ImporterBlockEntity importer) {
+                                IFluidHandler importerFluid = importer.getFluidHandler();
+                                if (importerFluid != null) {
+                                    NonNullList<FluidStack> importerFilters = importer.getFluidFilters();
+                                    boolean allowByImporter = importerFilters.stream().allMatch(FluidStack::isEmpty) ||
+                                            importerFilters.stream().anyMatch(f -> !f.isEmpty() &&
+                                                    FluidStack.isSameFluidSameComponents(f, simulatedDrain));
+                                    if (allowByImporter) {
+                                        int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
+                                        if (canReceive > 0) {
+                                            FluidStack extracted = targetFluidHandler.drain(canReceive, IFluidHandler.FluidAction.EXECUTE);
+                                            importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
+                                            lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                        }
+                    } else {
                         for (BlockPos importerPos : importerPositions) {
                             BlockEntity be = level.getBlockEntity(importerPos);
                             if (!(be instanceof ImporterBlockEntity importer)) continue;
@@ -233,27 +308,60 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
                             NonNullList<FluidStack> importerFilters = importer.getFluidFilters();
                             boolean allowByImporter = importerFilters.stream().allMatch(FluidStack::isEmpty) ||
-                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() && FluidStack.isSameFluidSameComponents(f, simulatedDrain));
+                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() &&
+                                            FluidStack.isSameFluidSameComponents(f, simulatedDrain));
                             if (!allowByImporter) continue;
+
                             int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
                             if (canReceive <= 0) continue;
+
                             FluidStack extracted = targetFluidHandler.drain(canReceive, IFluidHandler.FluidAction.EXECUTE);
                             importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
                             return;
                         }
                     }
                 }
+            }
 
+            // --- Chemicals ---
+            if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
+                int maxTransfer = getExtractAmount(RoutersTags.Items.CHEMICAL_UPGRADES);
 
-                if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
+                if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                    if (!importerPositions.isEmpty()) {
+                        int index = lastRoundRobinIndex % importerPositions.size();
+                        BlockPos importerPos = importerPositions.get(index);
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (be instanceof ImporterBlockEntity importer) {
+                            IChemicalHandler importerChemical = importer.getChemicalHandler();
+                            if (importerChemical != null) {
+                                for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
+                                    ChemicalStack stackInTank = targetChemicalHandler.getChemicalInTank(tank);
+                                    if (stackInTank.isEmpty()) continue;
+
+                                    ChemicalStack toExtract = stackInTank.copy();
+                                    toExtract.setAmount(Math.min(stackInTank.getAmount(), maxTransfer));
+
+                                    ChemicalStack remainder = importerChemical.insertChemical(toExtract, Action.SIMULATE);
+                                    long insertedAmount = toExtract.getAmount() - remainder.getAmount();
+                                    if (insertedAmount > 0) {
+                                        ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
+                                        importerChemical.insertChemical(extracted, Action.EXECUTE);
+                                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                    }
+                } else {
                     for (BlockPos importerPos : importerPositions) {
                         BlockEntity be = level.getBlockEntity(importerPos);
                         if (!(be instanceof ImporterBlockEntity importer)) continue;
 
                         IChemicalHandler importerChemical = importer.getChemicalHandler();
                         if (importerChemical == null) continue;
-
-                        int maxTransfer = getExtractAmount(RoutersTags.Items.CHEMICAL_UPGRADES);
 
                         for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
                             ChemicalStack stackInTank = targetChemicalHandler.getChemicalInTank(tank);
@@ -264,20 +372,18 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
                             ChemicalStack remainder = importerChemical.insertChemical(toExtract, Action.SIMULATE);
                             long insertedAmount = toExtract.getAmount() - remainder.getAmount();
-                            if (insertedAmount <= 0) continue;
-
-                            ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
-                            importerChemical.insertChemical(extracted, Action.EXECUTE);
-
-                            break;
+                            if (insertedAmount > 0) {
+                                ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
+                                importerChemical.insertChemical(extracted, Action.EXECUTE);
+                                return;
+                            }
                         }
                     }
                 }
-
             }
         }
-
     }
+
 
     public int getSpeedPerOperation() {
         if (hasUpgrade(RoutersTags.Items.SPEED_UPGRADES)) {

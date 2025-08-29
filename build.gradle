@@ -145,14 +145,13 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     mainFile.addEnvironment("server", "client")
 }
 
-//tasks.getByName("modrinth").setGroup("modpublishing")
+tasks.getByName("modrinth").setGroup("modpublishing")
 
-/*
 modrinth {
     token = System.getenv("modrinth_token").toString()
-    projectId = "QL7aPd0n"
+    projectId = "g69ApBz2"
     versionType = "release"
-    versionName = "smartcrafting-" + "$minecraft_version" + "-" + "$mod_version"
+    versionName = "routers-" + "$minecraft_version" + "-" + "$mod_version"
     uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
 
     gameVersions.addAll(minecraft_version)
@@ -164,7 +163,7 @@ modrinth {
     }
 }
 
- */
+
 
 
 

@@ -26,13 +26,20 @@ public class ConnectorItem extends Item {
 
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
 
-        BlockPos importerPos = stack.get(RoutersDataComponents.IMPORTER_POSITION.get());
-        if (importerPos != null) {
-            list.add(Component.literal("Importer Pos: " + importerPos.getX() + ", " + importerPos.getY() + ", " + importerPos.getZ()));
+        if (Screen.hasShiftDown()) {
+            components.add(Component.translatable("tooltip.routers.router_connector").withStyle(ChatFormatting.YELLOW));
+            BlockPos importerPos = stack.get(RoutersDataComponents.IMPORTER_POSITION.get());
+            if (importerPos != null) {
+                components.add(Component.literal("Importer Pos: " + importerPos.getX() + ", " + importerPos.getY() + ", " + importerPos.getZ()));
+            } else {
+                components.add(Component.literal("No Importer Pos Set").withStyle(ChatFormatting.RED));
+            }
         } else {
-            list.add(Component.literal("No Importer Pos Set").withStyle(ChatFormatting.RED));
+            components.add(Component.translatable("tooltip.routers.hold_shift").withStyle(ChatFormatting.YELLOW));
         }
+
+
     }
 }

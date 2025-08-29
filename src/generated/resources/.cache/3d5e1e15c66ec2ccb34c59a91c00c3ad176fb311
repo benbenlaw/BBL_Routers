@@ -1,6 +1,7 @@
-// 1.21.1	2025-08-27T14:14:19.5216157	Tags for minecraft:item mod id routers
+// 1.21.1	2025-08-28T18:41:30.4171186	Tags for minecraft:item mod id routers
 0035398d17663efe6105a88d4a7afd8725951fe3 data/routers/tags/item/chemical_upgrades.json
 f3956fc3da6dd7ba994e44e9a6764b4d1409debe data/routers/tags/item/fluid_upgrades.json
 d277f9227e8496c3b41d83d7ccbb7869b111a5f5 data/routers/tags/item/item_upgrades.json
 846f4628026f98cd8362f558fb7605d20ac34ee7 data/routers/tags/item/rf_upgrades.json
+5446cf4dd821d9fe464f4ef4c168a3c8a983a0cf data/routers/tags/item/round_robin_upgrades.json
 fca4dd8cde38598d0f46eb8724f5954db8952fc1 data/routers/tags/item/speed_upgrades.json

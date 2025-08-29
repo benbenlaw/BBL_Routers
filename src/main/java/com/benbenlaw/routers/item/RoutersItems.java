@@ -57,5 +57,8 @@ public class RoutersItems {
     public static final DeferredItem<Item> SPEED_UPGRADE_4 = ITEMS.register("speed_upgrade_4",
             () -> new UpgradeItem(new Item.Properties(), StartupConfig.speedPerOperation4.get()));
 
+    public static final DeferredItem<Item> ROUND_ROBIN_UPGRADE = ITEMS.register("round_robin_upgrade",
+            () -> new UpgradeItem(new Item.Properties(), 0));
+
 
 }

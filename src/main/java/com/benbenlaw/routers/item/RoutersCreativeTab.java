@@ -52,6 +52,8 @@ public class RoutersCreativeTab {
                 output.accept(RoutersItems.SPEED_UPGRADE_3);
                 output.accept(RoutersItems.SPEED_UPGRADE_4);
 
+                output.accept(RoutersItems.ROUND_ROBIN_UPGRADE);
+
 
             }).build());
 }

@@ -44,6 +44,8 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
         simpleItem(RoutersItems.SPEED_UPGRADE_3);
         simpleItem(RoutersItems.SPEED_UPGRADE_4);
 
+        simpleItem(RoutersItems.ROUND_ROBIN_UPGRADE);
+
     }
 
     private void simpleItem(DeferredItem<Item> item) {

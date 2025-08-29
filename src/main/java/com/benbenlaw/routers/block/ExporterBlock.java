@@ -7,6 +7,8 @@ import com.benbenlaw.routers.item.RoutersItems;
 import com.benbenlaw.routers.networking.packets.SyncFluidListToClient;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -16,7 +18,9 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -206,6 +210,15 @@ public class ExporterBlock extends BaseEntityBlock {
     @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> components, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
+            components.add(Component.translatable("tooltip.routers.exporter").withStyle(ChatFormatting.YELLOW));
+        } else {
+            components.add(Component.translatable("tooltip.routers.hold_shift").withStyle(ChatFormatting.YELLOW));
+        }
     }
 
     @Nullable

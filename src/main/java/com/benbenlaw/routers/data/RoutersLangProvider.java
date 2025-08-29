@@ -44,6 +44,9 @@ public class RoutersLangProvider extends LanguageProvider {
         addItemTranslation("speed_upgrade_3", "Speed Upgrade III");
         addItemTranslation("speed_upgrade_4", "Speed Upgrade IV");
 
+        addItemTranslation("round_robin_upgrade", "Round Robin Upgrade");
+
+
 
         //Blocks
         addBlockTranslation("importer_block", "Importer");
@@ -62,6 +65,10 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("fluid_upgrade", "Allows Extraction of Fluids from the Exporter at %s MB/Per Operation");
         addTooltipsTranslation("chemical_upgrade", "Allows Extraction of Chemicals from the Exporter at %s mB/Per Operation");
         addTooltipsTranslation("speed_upgrade", "Allows Extraction of from the Exporter every %s Ticks");
+        addTooltipsTranslation("round_robin_upgrade", "Extractor distributes in order evenly between multiple Importers");
+        addTooltipsTranslation("router_connector", "Right Click on an Importer to set the position then Right Click on an Exporter to link them. Right Click to unlink.");
+        addTooltipsTranslation("exporter", "Does nothing on its own, used to extract from the connected inventory to a connected Importer(s). Use Upgrades to allow different types of extraction.");
+        addTooltipsTranslation("importer", "Does nothing on its own, used to insert into the connected inventory from a connected Exporter.");
 
 
     }
