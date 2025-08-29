@@ -69,6 +69,8 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("router_connector", "Right Click on an Importer to set the position then Right Click on an Exporter to link them. Right Click to unlink.");
         addTooltipsTranslation("exporter", "Does nothing on its own, used to extract from the connected inventory to a connected Importer(s). Use Upgrades to allow different types of extraction.");
         addTooltipsTranslation("importer", "Does nothing on its own, used to insert into the connected inventory from a connected Exporter.");
+        addTooltipsTranslation("exporter_filter_slots", "Empty Item/Fluid Filter");
+        addTooltipsTranslation("exporter_upgrades_slots", "Upgrade Slot");
 
 
     }

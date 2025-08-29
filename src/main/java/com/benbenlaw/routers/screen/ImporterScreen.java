@@ -3,6 +3,7 @@ package com.benbenlaw.routers.screen;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -84,16 +85,21 @@ public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> {
         super.renderTooltip(guiGraphics, mouseX, mouseY);
 
         for (Slot slot : menu.slots) {
-            if (slot instanceof GhostSlot ghostSlot && isHovering(slot, mouseX, mouseY)) {
-                ItemStack stack = ghostSlot.getItem();
-                if (!stack.isEmpty()) {
-                    guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
-                }
+            if (isHovering(slot, mouseX, mouseY)) {
+                if (slot instanceof GhostSlot ghostSlot) {
+                    ItemStack stack = ghostSlot.getItem();
 
-                // For fluid ghost slots
-                if (ghostSlot.hasFluid() && !ghostSlot.getGhostFluid().isEmpty()) {
-                    Component fluidName = ghostSlot.getGhostFluid().getHoverName();
-                    guiGraphics.renderTooltip(font, fluidName, mouseX, mouseY);
+                    if (!stack.isEmpty()) {
+                        guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
+                    }
+                    else if (ghostSlot.hasFluid() && !ghostSlot.getGhostFluid().isEmpty()) {
+                        Component fluidName = ghostSlot.getGhostFluid().getHoverName();
+                        guiGraphics.renderTooltip(font, fluidName, mouseX, mouseY);
+                    }
+                    else {
+                        Component emptyText = Component.translatable("tooltip.routers.exporter_filter_slots").withStyle(ChatFormatting.GRAY);
+                        guiGraphics.renderTooltip(font, emptyText, mouseX, mouseY);
+                    }
                 }
             }
         }

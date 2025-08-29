@@ -16,6 +16,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ImporterMenu extends AbstractContainerMenu {
 
@@ -43,7 +44,7 @@ public class ImporterMenu extends AbstractContainerMenu {
         this.data = data;
         this.blockEntity = (ImporterBlockEntity) this.level.getBlockEntity(blockPos);
 
-        this.filterInventory = new SimpleContainer(blockEntity.getFilters().size()) {
+        this.filterInventory = new SimpleContainer(Objects.requireNonNull(blockEntity).getFilters().size()) {
             @Override
             public void setChanged() {
                 super.setChanged();

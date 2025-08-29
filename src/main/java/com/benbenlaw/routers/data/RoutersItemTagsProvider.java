@@ -21,6 +21,16 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
 
+        //All Upgrades
+        this.tag(RoutersTags.Items.UPGRADES)
+                .addTag(RoutersTags.Items.ITEM_UPGRADES)
+                .addTag(RoutersTags.Items.FLUID_UPGRADES)
+                .addTag(RoutersTags.Items.CHEMICAL_UPGRADES)
+                .addTag(RoutersTags.Items.RF_UPGRADES)
+                .addTag(RoutersTags.Items.SPEED_UPGRADES)
+                .addTag(RoutersTags.Items.ROUND_ROBIN_UPGRADES)
+        ;
+
         //RF Upgrades
         this.tag(RoutersTags.Items.RF_UPGRADES).add(
                 RoutersItems.RF_UPGRADE_1.get(),

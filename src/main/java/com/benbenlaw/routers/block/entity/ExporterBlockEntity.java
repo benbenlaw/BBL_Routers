@@ -69,6 +69,18 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         protected int getStackLimit(int slot, ItemStack stack) {
             return 1;
         }
+
+        @Override
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            if (stack.is(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                for (int i = 0; i < getSlots(); i++) {
+                    if (i != slot && getStackInSlot(i).is(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                        return false;
+                    }
+                }
+            } else return stack.is(RoutersTags.Items.UPGRADES);
+            return false;
+        }
     };
 
     @Override

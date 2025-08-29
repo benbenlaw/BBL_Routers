@@ -51,6 +51,8 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
 
                 if (!fluid.isEmpty()) {
                     renderFluidStack(guiGraphics, fluid, x + slot.x, y + slot.y, 16, 16);
+                }else {
+                    guiGraphics.renderTooltip(font, Component.literal("empty"), mouseX, mouseY);
                 }
             }
         }
@@ -89,20 +91,33 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
         super.renderTooltip(guiGraphics, mouseX, mouseY);
 
         for (Slot slot : menu.slots) {
-            if (slot instanceof GhostSlot ghostSlot && isHovering(slot, mouseX, mouseY)) {
-                ItemStack stack = ghostSlot.getItem();
-                if (!stack.isEmpty()) {
-                    guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
-                }
+            if (isHovering(slot, mouseX, mouseY)) {
+                // Ghost slot tooltips
+                if (slot instanceof GhostSlot ghostSlot) {
+                    ItemStack stack = ghostSlot.getItem();
 
-                // For fluid ghost slots
-                if (ghostSlot.hasFluid() && !ghostSlot.getGhostFluid().isEmpty()) {
-                    Component fluidName = ghostSlot.getGhostFluid().getHoverName();
-                    guiGraphics.renderTooltip(font, fluidName, mouseX, mouseY);
+                    if (!stack.isEmpty()) {
+                        guiGraphics.renderTooltip(font, stack, mouseX, mouseY);
+                    }
+                    else if (ghostSlot.hasFluid() && !ghostSlot.getGhostFluid().isEmpty()) {
+                        Component fluidName = ghostSlot.getGhostFluid().getHoverName();
+                        guiGraphics.renderTooltip(font, fluidName, mouseX, mouseY);
+                    }
+                    else {
+                        Component emptyText = Component.translatable("tooltip.routers.exporter_filter_slots").withStyle(ChatFormatting.GRAY);
+                        guiGraphics.renderTooltip(font, emptyText, mouseX, mouseY);
+                    }
+                }
+                // Upgrade slot tooltips
+                else if (slot.getItem().isEmpty()) {
+                    Component upgradeText = Component.translatable("tooltip.routers.exporter_upgrades_slots").withStyle(ChatFormatting.GRAY);
+                    guiGraphics.renderTooltip(font, upgradeText, mouseX, mouseY);
                 }
             }
         }
     }
+
+
 
     private boolean isHovering(Slot slot, double mouseX, double mouseY) {
         return mouseX >= leftPos + slot.x && mouseX < leftPos + slot.x + 16

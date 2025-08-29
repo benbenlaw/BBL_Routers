@@ -30,6 +30,8 @@
   "message.routers.importer.removed_pos": "Removed Importer position",
   "tooltip.routers.chemical_upgrade": "Allows Extraction of Chemicals from the Exporter at %s mB/Per Operation",
   "tooltip.routers.exporter": "Does nothing on its own, used to extract from the connected inventory to a connected Importer(s). Use Upgrades to allow different types of extraction.",
+  "tooltip.routers.exporter_filter_slots": "Empty Item/Fluid Filter",
+  "tooltip.routers.exporter_upgrades_slots": "Upgrade Slot",
   "tooltip.routers.fluid_upgrade": "Allows Extraction of Fluids from the Exporter at %s MB/Per Operation",
   "tooltip.routers.hold_shift": "Press SHIFT for more info",
   "tooltip.routers.importer": "Does nothing on its own, used to insert into the connected inventory from a connected Exporter.",

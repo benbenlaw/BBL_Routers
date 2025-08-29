@@ -1,10 +1,13 @@
 package com.benbenlaw.routers.screen;
 
+import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
 import com.benbenlaw.routers.screen.util.GhostSlot;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,10 +15,12 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ExporterMenu extends AbstractContainerMenu {
 
@@ -38,7 +43,7 @@ public class ExporterMenu extends AbstractContainerMenu {
         this.data = data;
         this.blockEntity = (ExporterBlockEntity) this.level.getBlockEntity(blockPos);
 
-        this.filterInventory = new SimpleContainer(blockEntity.getFilters().size()) {
+        this.filterInventory = new SimpleContainer(Objects.requireNonNull(blockEntity).getFilters().size()) {
             @Override
             public void setChanged() {
                 super.setChanged();
@@ -61,7 +66,12 @@ public class ExporterMenu extends AbstractContainerMenu {
 
         //Upgrade Slots (real slots from block entity)
         for (int col = 0; col < 9; col++) {
-            this.addSlot(new SlotItemHandler(blockEntity.getItemStackHandler(), col, 8 + col * 18, 57 ));
+            this.addSlot(new SlotItemHandler(blockEntity.getItemStackHandler(), col, 8 + col * 18, 57 ){
+                @Override
+                public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+                    return Pair.of(InventoryMenu.BLOCK_ATLAS, ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, "item/gui/upgrade_slot"));
+                }
+            });
         }
 
         // Add player inventory and hotbar
@@ -120,7 +130,7 @@ public class ExporterMenu extends AbstractContainerMenu {
         Slot slot = slots.get(slotId);
         if (slot instanceof GhostSlot ghostSlot) {
             ItemStack carried = player.containerMenu.getCarried();
-            var fluid = net.neoforged.neoforge.fluids.FluidUtil.getFluidContained(carried);
+            var fluid = FluidUtil.getFluidContained(carried);
 
             if (fluid.isPresent()) {
                 blockEntity.getFilters().set(slotId, ItemStack.EMPTY);

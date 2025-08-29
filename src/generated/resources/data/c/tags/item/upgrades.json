@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#routers:item_upgrades",
+    "#routers:fluid_upgrades",
+    "#routers:chemical_upgrades",
+    "#routers:rf_upgrades",
+    "#routers:speed_upgrades",
+    "#routers:round_robin_upgrades"
+  ]
+}

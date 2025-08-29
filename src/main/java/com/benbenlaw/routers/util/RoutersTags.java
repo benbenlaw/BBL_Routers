@@ -12,6 +12,9 @@ import net.minecraft.world.level.block.Block;
 public class RoutersTags {
 
     public static class Items {
+
+        public static final TagKey<Item> UPGRADES = commonTags("upgrades");
+
         public static final TagKey<Item> RF_UPGRADES = tag("rf_upgrades");
         public static final TagKey<Item> ITEM_UPGRADES = tag("item_upgrades");
         public static final TagKey<Item> FLUID_UPGRADES = tag("fluid_upgrades");

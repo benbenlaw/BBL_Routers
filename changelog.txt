@@ -1,5 +1,9 @@
 Routers
 
+1.0.6
+Upgrade slots in the Exporter no have empty item background
+Export and Importer now show tooltips inside the gui for all slots
+
 1.0.5
 Fixed Tooltips not displaying for fluids and item that are in the filter
 Slightly improved tick of exporter
