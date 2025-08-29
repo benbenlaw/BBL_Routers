@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "routers:item/chemical_upgrade_1"
+    "layer0": "routers:item/source_upgrade_1"
   }
 }

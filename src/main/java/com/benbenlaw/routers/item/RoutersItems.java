@@ -57,6 +57,19 @@ public class RoutersItems {
     public static final DeferredItem<Item> SPEED_UPGRADE_4 = ITEMS.register("speed_upgrade_4",
             () -> new UpgradeItem(new Item.Properties(), StartupConfig.speedPerOperation4.get()));
 
+    public static final DeferredItem<Item> SOURCE_UPGRADE_1 = ITEMS.register("source_upgrade_1",
+            () -> new UpgradeItem(new Item.Properties(), StartupConfig.sourcePerOperation1.get()));
+    public static final DeferredItem<Item> SOURCE_UPGRADE_2 = ITEMS.register("source_upgrade_2",
+            () -> new UpgradeItem(new Item.Properties(), StartupConfig.sourcePerOperation2.get()));
+    public static final DeferredItem<Item> SOURCE_UPGRADE_3 = ITEMS.register("source_upgrade_3",
+            () -> new UpgradeItem(new Item.Properties(), StartupConfig.sourcePerOperation3.get()));
+    public static final DeferredItem<Item> SOURCE_UPGRADE_4 = ITEMS.register("source_upgrade_4",
+            () -> new UpgradeItem(new Item.Properties(), StartupConfig.sourcePerOperation4.get()));
+
+
+
+
+
     public static final DeferredItem<Item> ROUND_ROBIN_UPGRADE = ITEMS.register("round_robin_upgrade",
             () -> new UpgradeItem(new Item.Properties(), 0));
 

@@ -19,6 +19,10 @@
   "item.routers.rf_upgrade_4": "RF Upgrade IV",
   "item.routers.round_robin_upgrade": "Round Robin Upgrade",
   "item.routers.router_connector": "Connector",
+  "item.routers.source_upgrade_1": "Source Upgrade I",
+  "item.routers.source_upgrade_2": "Source Upgrade II",
+  "item.routers.source_upgrade_3": "Source Upgrade III",
+  "item.routers.source_upgrade_4": "Source Upgrade IV",
   "item.routers.speed_upgrade_1": "Speed Upgrade I",
   "item.routers.speed_upgrade_2": "Speed Upgrade II",
   "item.routers.speed_upgrade_3": "Speed Upgrade III",
@@ -28,7 +32,7 @@
   "message.routers.exporter.remove_importer": "Removed Importer from Exporter",
   "message.routers.importer.added_pos": "Added Importer position",
   "message.routers.importer.removed_pos": "Removed Importer position",
-  "tooltip.routers.chemical_upgrade": "Allows Extraction of Chemicals from the Exporter at %s mB/Per Operation",
+  "tooltip.routers.chemical_upgrade": "Allows Extraction of Mekanism Chemicals from the Exporter at %s mB/Per Operation",
   "tooltip.routers.exporter": "Does nothing on its own, used to extract from the connected inventory to a connected Importer(s). Use Upgrades to allow different types of extraction.",
   "tooltip.routers.exporter_filter_slots": "Empty Item/Fluid Filter",
   "tooltip.routers.exporter_upgrades_slots": "Upgrade Slot",
@@ -39,5 +43,6 @@
   "tooltip.routers.rf_upgrade": "Allows Extraction of RF from the Exporter at %s RF/Per Operation",
   "tooltip.routers.round_robin_upgrade": "Extractor distributes in order evenly between multiple Importers",
   "tooltip.routers.router_connector": "Right Click on an Importer to set the position then Right Click on an Exporter to link them. Right Click to unlink.",
+  "tooltip.routers.source_upgrade": "Allows Extraction of Ars Nouveau Source from the Exporter at %s Per Operation",
   "tooltip.routers.speed_upgrade": "Allows Extraction of from the Exporter every %s Ticks"
 }

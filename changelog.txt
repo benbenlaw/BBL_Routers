@@ -1,5 +1,10 @@
 Routers
 
+1.0.7
+Changed chemical upgrade recipes
+Added support for Source from Ars Nouveau, uses Source Upgrades, supports round-robin
+Tweaked ordering of upgrades to have item, fluid and energy first with round-robin, modded specific upgrades after
+
 1.0.6
 Upgrade slots in the Exporter no have empty item background
 Export and Importer now show tooltips inside the gui for all slots

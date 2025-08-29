@@ -34,6 +34,13 @@ public class StartupConfig {
     public static final ModConfigSpec.ConfigValue<Integer> speedPerOperation3;
     public static final ModConfigSpec.ConfigValue<Integer> speedPerOperation4;
 
+    public static final ModConfigSpec.ConfigValue<Integer> sourcePerOperation1;
+    public static final ModConfigSpec.ConfigValue<Integer> sourcePerOperation2;
+    public static final ModConfigSpec.ConfigValue<Integer> sourcePerOperation3;
+    public static final ModConfigSpec.ConfigValue<Integer> sourcePerOperation4;
+
+
+
 
 
     static {
@@ -128,7 +135,24 @@ public class StartupConfig {
                 .comment("The speed multiplier that tier 4 can provide.")
                 .defineInRange("Speed Per Operation 4", 1, 1, Integer.MAX_VALUE);
 
+        BUILDER.pop();
 
+        BUILDER.push("Source Upgrades");
+
+        sourcePerOperation1 = BUILDER
+                .comment("The maximum sources per operation that tier 1 can provide.")
+                .defineInRange("Source Per Operation 1", 10, 1, Integer.MAX_VALUE);
+        sourcePerOperation2 = BUILDER
+                .comment("The maximum sources per operation that tier 2 can provide.")
+                .defineInRange("Source Per Operation 2", 100, 1, Integer.MAX_VALUE);
+        sourcePerOperation3 = BUILDER
+                .comment("The maximum sources per operation that tier 3 can provide.")
+                .defineInRange("Source Per Operation 3", 500, 1, Integer.MAX_VALUE);
+        sourcePerOperation4 = BUILDER
+                .comment("The maximum sources per operation that tier 4 can provide.")
+                .defineInRange("Source Per Operation 4", 1000, 1, Integer.MAX_VALUE);
+
+        BUILDER.pop();
 
         SPEC = BUILDER.build();
 

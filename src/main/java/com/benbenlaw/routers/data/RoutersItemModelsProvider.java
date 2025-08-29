@@ -34,15 +34,15 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
         simpleItem(RoutersItems.FLUID_UPGRADE_3);
         simpleItem(RoutersItems.FLUID_UPGRADE_4);
 
-        simpleItem(RoutersItems.CHEMICAL_UPGRADE_1);
-        simpleItem(RoutersItems.CHEMICAL_UPGRADE_2);
-        simpleItem(RoutersItems.CHEMICAL_UPGRADE_3);
-        simpleItem(RoutersItems.CHEMICAL_UPGRADE_4);
-
         simpleItem(RoutersItems.SPEED_UPGRADE_1);
         simpleItem(RoutersItems.SPEED_UPGRADE_2);
         simpleItem(RoutersItems.SPEED_UPGRADE_3);
         simpleItem(RoutersItems.SPEED_UPGRADE_4);
+
+        simpleItem(RoutersItems.SOURCE_UPGRADE_1);
+        simpleItem(RoutersItems.SOURCE_UPGRADE_2);
+        simpleItem(RoutersItems.SOURCE_UPGRADE_3);
+        simpleItem(RoutersItems.SOURCE_UPGRADE_4);
 
         simpleItem(RoutersItems.ROUND_ROBIN_UPGRADE);
 

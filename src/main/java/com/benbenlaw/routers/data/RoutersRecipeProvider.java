@@ -2,6 +2,12 @@ package com.benbenlaw.routers.data;
 
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.item.RoutersItems;
+import com.hollingsworth.arsnouveau.ArsNouveau;
+import com.hollingsworth.arsnouveau.common.items.ModItem;
+import com.hollingsworth.arsnouveau.common.lib.LibItemNames;
+import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
+import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
+import mekanism.common.registries.MekanismItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -204,48 +210,44 @@ public class RoutersRecipeProvider extends RecipeProvider {
 
         //Chemical Upgrade 1
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_1.get())
-                .pattern("CAC")
+                .pattern(" A ")
                 .pattern("ABA")
-                .pattern("CAC")
-                .define('A', Items.GLASS)
-                .define('B', Items.IRON_INGOT)
-                .define('C', Items.IRON_NUGGET)
+                .pattern(" A ")
+                .define('A', Items.IRON_INGOT)
+                .define('B', MekanismItems.CHEMICAL_UPGRADE)
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.GLASS))
                 .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
 
         //Chemical Upgrade 2
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_2.get())
-                .pattern("CAC")
+                .pattern(" A ")
                 .pattern("ABA")
-                .pattern("CAC")
-                .define('A', Items.GLASS)
-                .define('B', Items.GOLD_INGOT)
-                .define('C', Items.GOLD_NUGGET)
+                .pattern(" A ")
+                .define('A', Items.GOLD_INGOT)
+                .define('B', MekanismItems.CHEMICAL_UPGRADE)
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.GLASS))
                 .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
 
         //Chemical Upgrade 3
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_3.get())
-                .pattern("CAC")
+                .pattern(" A ")
                 .pattern("ABA")
-                .pattern("CAC")
-                .define('A', Items.GLASS)
-                .define('B', Items.DIAMOND)
-                .define('C', Items.EMERALD)
+                .pattern(" A ")
+                .define('A', Items.DIAMOND)
+                .define('B', MekanismItems.CHEMICAL_UPGRADE)
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.GLASS))
                 .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
 
         //Chemical Upgrade 4
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.CHEMICAL_UPGRADE_4.get())
-                .pattern("CAC")
+                .pattern(" A ")
                 .pattern("ABA")
-                .pattern("CAC")
-                .define('A', Items.GLASS)
-                .define('B', Items.NETHERITE_INGOT)
-                .define('C', Items.NETHERITE_SCRAP)
+                .pattern(" A ")
+                .define('A', Items.NETHERITE_INGOT)
+                .define('B', MekanismItems.CHEMICAL_UPGRADE)
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.GLASS))
                 .save(consumer.withConditions(new ModLoadedCondition("mekanism")));
@@ -309,6 +311,50 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.REDSTONE))
                 .save(consumer);
+
+        //Source Upgrade 1
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SOURCE_UPGRADE_1.get())
+                .pattern(" A ")
+                .pattern("ABA")
+                .pattern(" A ")
+                .define('A', Items.IRON_INGOT)
+                .define('B', BlockRegistry.SOURCE_GEM_BLOCK)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.IRON_INGOT))
+                .save(consumer.withConditions(new ModLoadedCondition("ars_nouveau")));
+
+        //Source Upgrade 2
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SOURCE_UPGRADE_2.get())
+                .pattern(" A ")
+                .pattern("ABA")
+                .pattern(" A ")
+                .define('A', Items.GOLD_INGOT)
+                .define('B', BlockRegistry.SOURCE_GEM_BLOCK)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.GOLD_INGOT))
+                .save(consumer.withConditions(new ModLoadedCondition("ars_nouveau")));
+
+        //Source Upgrade 3
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SOURCE_UPGRADE_3.get())
+                .pattern(" A ")
+                .pattern("ABA")
+                .pattern(" A ")
+                .define('A', Items.DIAMOND)
+                .define('B', BlockRegistry.SOURCE_GEM_BLOCK)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.DIAMOND))
+                .save(consumer.withConditions(new ModLoadedCondition("ars_nouveau")));
+
+        //Source Upgrade 4
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SOURCE_UPGRADE_4.get())
+                .pattern(" A ")
+                .pattern("ABA")
+                .pattern(" A ")
+                .define('A', Items.NETHERITE_INGOT)
+                .define('B', BlockRegistry.SOURCE_GEM_BLOCK)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.NETHERITE_INGOT))
+                .save(consumer.withConditions(new ModLoadedCondition("ars_nouveau")));
     }
 
 }

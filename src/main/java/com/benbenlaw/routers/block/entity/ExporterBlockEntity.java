@@ -7,6 +7,9 @@ import com.benbenlaw.routers.item.UpgradeItem;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.benbenlaw.routers.screen.util.FluidContainerHelper;
 import com.benbenlaw.routers.util.RoutersTags;
+import com.hollingsworth.arsnouveau.api.source.ISourceCap;
+import com.hollingsworth.arsnouveau.common.capability.SourceStorage;
+import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 import mekanism.api.Action;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
@@ -36,6 +39,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -48,6 +52,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IAttachmentHolder {
 
@@ -78,9 +83,12 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                         return false;
                     }
                 }
-            } else return stack.is(RoutersTags.Items.UPGRADES);
-            return false;
+                return true;
+            } else {
+                return stack.is(RoutersTags.Items.UPGRADES);
+            }
         }
+
     };
 
     @Override
@@ -203,6 +211,11 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
             IChemicalHandler targetChemicalHandler = ModList.get().isLoaded("mekanism")
                     ? RoutersCapabilities.CHEMICAL_HANDLER.getCapability(
+                    level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection)
+                    : null;
+
+            ISourceCap targetSourceHandler = ModList.get().isLoaded("ars_nouveau")
+                    ? CapabilityRegistry.SOURCE_CAPABILITY.getCapability(
                     level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection)
                     : null;
 
@@ -393,6 +406,52 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
+            // --- Ars Nouveau Source ---
+            if (targetSourceHandler != null && hasUpgrade(RoutersTags.Items.SOURCE_UPGRADES)) {
+                int maxTransfer = getExtractAmount(RoutersTags.Items.SOURCE_UPGRADES);
+
+                if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                    if (!importerPositions.isEmpty()) {
+                        int index = lastRoundRobinIndex % importerPositions.size();
+                        BlockPos importerPos = importerPositions.get(index);
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (be instanceof ImporterBlockEntity importer) {
+                            ISourceCap importerSource = importer.getSourceHandler();
+                            if (importerSource != null) {
+                                int canExtract = targetSourceHandler.extractSource(maxTransfer, true);
+                                int canReceive = importerSource.receiveSource(canExtract, true);
+                                int transferAmount = Math.min(canExtract, canReceive);
+                                if (transferAmount > 0) {
+                                    targetSourceHandler.extractSource(transferAmount, false);
+                                    importerSource.receiveSource(transferAmount, false);
+                                    lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                    return;
+                                }
+                            }
+                        }
+                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                    }
+                } else {
+                    for (BlockPos importerPos : importerPositions) {
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                        ISourceCap importerSource = importer.getSourceHandler();
+                        if (importerSource == null) continue;
+
+                        int canExtract = targetSourceHandler.extractSource(maxTransfer, true);
+                        int canReceive = importerSource.receiveSource(canExtract, true);
+                        int transferAmount = Math.min(canExtract, canReceive);
+                        if (transferAmount > 0) {
+                            targetSourceHandler.extractSource(transferAmount, false);
+                            importerSource.receiveSource(transferAmount, false);
+                            maxTransfer -= transferAmount;
+                            if (maxTransfer <= 0) break;
+                        }
+                    }
+                }
+            }
+
         }
     }
 

@@ -74,6 +74,9 @@ dependencies {
     implementation "curse.maven:titanium-287342:6443608" // Titanium for Function Storage
     implementation "curse.maven:refined-storage-243076:6391989" // RS2
     implementation "curse.maven:pipez-443900:5757713" // Pipez
+    implementation "curse.maven:ars-nouveau-401955:6827634" // ars nouveau
+    implementation "curse.maven:curios-309927:6529130" // curios
+    implementation "curse.maven:geckolib-388172:6920810" // geckolib
 
 }
 

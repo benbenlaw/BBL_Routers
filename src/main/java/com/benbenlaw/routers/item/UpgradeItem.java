@@ -43,6 +43,9 @@ public class UpgradeItem extends Item {
             if (stack.is(RoutersTags.Items.SPEED_UPGRADES)) {
                 components.add(Component.translatable("tooltip.routers.speed_upgrade", extractValuePerOperation).withStyle(ChatFormatting.YELLOW));
             }
+            if (stack.is(RoutersTags.Items.SOURCE_UPGRADES)) {
+                components.add(Component.translatable("tooltip.routers.source_upgrade", extractValuePerOperation).withStyle(ChatFormatting.YELLOW));
+            }
             if (stack.is(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
                 components.add(Component.translatable("tooltip.routers.round_robin_upgrade", extractValuePerOperation).withStyle(ChatFormatting.YELLOW));
             }

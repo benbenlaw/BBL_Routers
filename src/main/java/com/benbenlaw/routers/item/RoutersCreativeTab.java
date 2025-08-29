@@ -40,19 +40,26 @@ public class RoutersCreativeTab {
                 output.accept(RoutersItems.FLUID_UPGRADE_3);
                 output.accept(RoutersItems.FLUID_UPGRADE_4);
 
-                if (ModList.get().isLoaded("mekanism")){
-                    output.accept(RoutersItems.CHEMICAL_UPGRADE_1);
-                    output.accept(RoutersItems.CHEMICAL_UPGRADE_2);
-                    output.accept(RoutersItems.CHEMICAL_UPGRADE_3);
-                    output.accept(RoutersItems.CHEMICAL_UPGRADE_4);
-                }
-                
                 output.accept(RoutersItems.SPEED_UPGRADE_1);
                 output.accept(RoutersItems.SPEED_UPGRADE_2);
                 output.accept(RoutersItems.SPEED_UPGRADE_3);
                 output.accept(RoutersItems.SPEED_UPGRADE_4);
 
                 output.accept(RoutersItems.ROUND_ROBIN_UPGRADE);
+
+                if (ModList.get().isLoaded("mekanism")){
+                    output.accept(RoutersItems.CHEMICAL_UPGRADE_1);
+                    output.accept(RoutersItems.CHEMICAL_UPGRADE_2);
+                    output.accept(RoutersItems.CHEMICAL_UPGRADE_3);
+                    output.accept(RoutersItems.CHEMICAL_UPGRADE_4);
+                }
+
+                if (ModList.get().isLoaded("ars_nouveau")){
+                    output.accept(RoutersItems.SOURCE_UPGRADE_1);
+                    output.accept(RoutersItems.SOURCE_UPGRADE_2);
+                    output.accept(RoutersItems.SOURCE_UPGRADE_3);
+                    output.accept(RoutersItems.SOURCE_UPGRADE_4);
+                }
 
 
             }).build());

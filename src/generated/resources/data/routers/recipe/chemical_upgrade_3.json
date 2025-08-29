@@ -10,19 +10,16 @@
   "group": "strainers",
   "key": {
     "A": {
-      "item": "minecraft:glass"
-    },
-    "B": {
       "item": "minecraft:diamond"
     },
-    "C": {
-      "item": "minecraft:emerald"
+    "B": {
+      "item": "mekanism:upgrade_chemical"
     }
   },
   "pattern": [
-    "CAC",
+    " A ",
     "ABA",
-    "CAC"
+    " A "
   ],
   "result": {
     "count": 1,

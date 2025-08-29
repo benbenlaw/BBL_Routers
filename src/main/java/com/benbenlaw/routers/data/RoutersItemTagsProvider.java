@@ -29,7 +29,17 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
                 .addTag(RoutersTags.Items.RF_UPGRADES)
                 .addTag(RoutersTags.Items.SPEED_UPGRADES)
                 .addTag(RoutersTags.Items.ROUND_ROBIN_UPGRADES)
+                .addTag(RoutersTags.Items.SOURCE_UPGRADES)
         ;
+
+        //Source Upgrades
+        this.tag(RoutersTags.Items.SOURCE_UPGRADES).add(
+                RoutersItems.SOURCE_UPGRADE_1.get(),
+                RoutersItems.SOURCE_UPGRADE_2.get(),
+                RoutersItems.SOURCE_UPGRADE_3.get(),
+                RoutersItems.SOURCE_UPGRADE_4.get()
+        );
+
 
         //RF Upgrades
         this.tag(RoutersTags.Items.RF_UPGRADES).add(

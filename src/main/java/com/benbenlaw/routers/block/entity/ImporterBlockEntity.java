@@ -4,6 +4,9 @@ import com.benbenlaw.routers.block.ImporterBlock;
 import com.benbenlaw.routers.integration.RoutersCapabilities;
 import com.benbenlaw.routers.screen.ImporterMenu;
 import com.benbenlaw.routers.screen.util.FluidContainerHelper;
+import com.hollingsworth.arsnouveau.api.source.ISourceCap;
+import com.hollingsworth.arsnouveau.common.capability.SourceStorage;
+import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,6 +42,7 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     private IFluidHandler fluidHandler;
     private IEnergyStorage energyStorage;
     private IChemicalHandler chemicalHandler;
+    private ISourceCap sourceStorage;
     public final ContainerData data;
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
@@ -113,6 +117,13 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
                     setChemicalHandler(chemicalHandler);
                 }
             }
+
+            if (ModList.get().isLoaded("ars_nouveau")) {
+                ISourceCap sourceHandler = CapabilityRegistry.SOURCE_CAPABILITY.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+                if (sourceHandler != null) {
+                    setSourceHandler(sourceHandler);
+                }
+            }
         }
     }
 
@@ -147,6 +158,15 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     public void setChemicalHandler(IChemicalHandler handler) {
         this.chemicalHandler = handler;
     }
+
+    public ISourceCap getSourceHandler() {
+        return sourceStorage;
+    }
+
+    public void setSourceHandler(ISourceCap handler) {
+        this.sourceStorage = handler;
+    }
+
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider p_323910_) {
