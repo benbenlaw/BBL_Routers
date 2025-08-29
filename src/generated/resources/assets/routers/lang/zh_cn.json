@@ -17,6 +17,7 @@
   "item.routers.rf_upgrade_2": "RF升级 II",
   "item.routers.rf_upgrade_3": "RF升级 III",
   "item.routers.rf_upgrade_4": "RF升级 IV",
+  "item.routers.round_robin_upgrade": "轮询升级",
   "item.routers.router_connector": "连接器",
   "item.routers.speed_upgrade_1": "速度升级 I",
   "item.routers.speed_upgrade_2": "速度升级 II",
@@ -28,9 +29,13 @@
   "message.routers.importer.added_pos": "已添加输入口位置",
   "message.routers.importer.removed_pos": "已移除输入口位置",
   "tooltip.routers.chemical_upgrade": "允许输出口提取化学品，每次操作转移%s mB",
+  "tooltip.routers.exporter": "单独存在时没有作用，用于从连接的容器中提取内容至所连接的输入口。使用升级可实现不同类型的提取功能。",
   "tooltip.routers.fluid_upgrade": "允许输出口提取流体，每次操作转移%s mB",
   "tooltip.routers.hold_shift": "按住SHIFT查看更多信息",
+  "tooltip.routers.importer": "单独存在时没有作用，用于将所连接输出口传入的内容输入至连接的容器中。",
   "tooltip.routers.item_upgrade": "允许输出口提取物品，每次操作转移%s个物品",
   "tooltip.routers.rf_upgrade": "允许输出口提取RF，每次操作转移%s RF",
+  "tooltip.routers.round_robin_upgrade": "输出口将按顺序在多个输入口之间均匀分配传出内容",
+  "tooltip.routers.router_connector": "右击输入口以设置位置，然后右击输出口进行连接。右击可解除连接。",
   "tooltip.routers.speed_upgrade": "允许输出口每%s刻进行一次操作"
 }
