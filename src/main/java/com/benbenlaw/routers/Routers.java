@@ -2,6 +2,8 @@ package com.benbenlaw.routers;
 
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
+import com.benbenlaw.routers.block.entity.client.ExporterBlockEntityRenderer;
+import com.benbenlaw.routers.block.particle.RoutersParticles;
 import com.benbenlaw.routers.config.StartupConfig;
 import com.benbenlaw.routers.item.RoutersCreativeTab;
 import com.benbenlaw.routers.item.RoutersDataComponents;
@@ -38,6 +40,7 @@ public class Routers {
         RoutersBlockEntities.BLOCK_ENTITIES.register(eventBus);
         RoutersMenuTypes.MENUS.register(eventBus);
         RoutersCreativeTab.CREATIVE_MODE_TABS.register(eventBus);
+        RoutersParticles.PARTICLE_TYPES.register(eventBus);
 
         eventBus.addListener(this::commonSetup);
 
@@ -60,6 +63,7 @@ public class Routers {
 
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            // Moved to event bus
             //event.registerBlockEntityRenderer(RoutersBlockEntities.EXPORTER_BLOCK_ENTITY.get(), ExporterBlockEntityRenderer::new);
         }
     }

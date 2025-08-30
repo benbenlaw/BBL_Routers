@@ -150,41 +150,39 @@ public class ExporterBlock extends BaseEntityBlock {
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult result) {
 
-        if (level.isClientSide()) return ItemInteractionResult.SUCCESS;
+        if (level.isClientSide()) {
+            return ItemInteractionResult.SUCCESS; // Only run server-side
+        }
 
+        BlockEntity be = level.getBlockEntity(blockPos);
+        if (!(be instanceof ExporterBlockEntity exporter)) return ItemInteractionResult.SUCCESS;
+
+        // --- Handle router connector ---
         if (stack.is(RoutersItems.ROUTER_CONNECTOR)) {
-            if (stack.get(RoutersDataComponents.IMPORTER_POSITION.get()) != null) {
-
-                ExporterBlockEntity exporter = (ExporterBlockEntity) level.getBlockEntity(blockPos);
-                assert exporter != null;
-
-                BlockPos importerPos = stack.get(RoutersDataComponents.IMPORTER_POSITION.get());
-                List<BlockPos> importers = exporter.getImporterPositions();
-                if (importers.contains(importerPos)) {
-                    importers.remove(importerPos);
-                    player.displayClientMessage(Component.translatable("message.routers.exporter.remove_importer"), true);
-                } else {
-                    importers.add(importerPos);
-                    player.displayClientMessage(Component.translatable("message.routers.exporter.add_importer"), true);
-                }
+            BlockPos importerPos = stack.get(RoutersDataComponents.IMPORTER_POSITION.get());
+            if (importerPos != null) {
+                exporter.toggleImporter(importerPos, player); // helper handles add/remove, setChanged, and sync
             }
-        } else {
-            ExporterBlockEntity exporter = (ExporterBlockEntity) level.getBlockEntity(blockPos);
-            if (exporter instanceof ExporterBlockEntity) {
-
-
-                ContainerData data = exporter.data;
-                player.openMenu(new SimpleMenuProvider(
-                        (windowId, playerInventory, playerEntity) -> new ExporterMenu(windowId, playerInventory, blockPos, data),
-                        Component.translatable("block.routers.exporter_block")), (buf -> buf.writeBlockPos(blockPos)));
-
-                PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFluidListToClient(blockPos, exporter.getFluidFilters()));
-            }
-            return ItemInteractionResult.SUCCESS;
 
         }
+        // --- Handle normal interaction (open GUI) ---
+        else {
+            ContainerData data = exporter.data;
+            player.openMenu(new SimpleMenuProvider(
+                            (windowId, playerInventory, playerEntity) -> new ExporterMenu(windowId, playerInventory, blockPos, data),
+                            Component.translatable("block.routers.exporter_block")),
+                    (buf -> buf.writeBlockPos(blockPos))
+            );
+
+            // Optional: sync fluid filters to client
+            if (player instanceof ServerPlayer serverPlayer) {
+                PacketDistributor.sendToPlayer(serverPlayer, new SyncFluidListToClient(blockPos, exporter.getFluidFilters()));
+            }
+        }
+
         return ItemInteractionResult.SUCCESS;
     }
+
 
     /* FACING */
     @Override

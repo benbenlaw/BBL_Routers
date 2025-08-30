@@ -88,13 +88,14 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public void tick() {
+        if (level == null || level.isClientSide) return;
+
         Direction facing = this.getBlockState().getValue(ImporterBlock.FACING);
         BlockPos targetPos = worldPosition.relative(facing);
         assert level != null;
         BlockEntity targetBlockEntity = level.getBlockEntity(targetPos);
         Direction inputDirection = facing.getOpposite();
 
-        if(level.isClientSide) return;
         if (level.getGameTime() % 20 != 0) return;
 
         if (targetBlockEntity != null) {

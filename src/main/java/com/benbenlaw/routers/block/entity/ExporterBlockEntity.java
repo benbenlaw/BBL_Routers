@@ -17,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -24,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
@@ -51,7 +53,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IAttachmentHolder {
@@ -137,16 +141,31 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         return itemHandler;
     }
 
-    public void addImporterPosition(BlockPos pos) {
-        if (!importerPositions.contains(pos)) {
-            importerPositions.add(pos);
-            setChanged();
+    public void toggleImporter(BlockPos importerPos, Player player) {
+        if (importerPositions.contains(importerPos)) {
+            importerPositions.remove(importerPos);
+            player.displayClientMessage(Component.translatable("message.routers.exporter.remove_importer"), true);
+        } else {
+            importerPositions.add(importerPos);
+            player.displayClientMessage(Component.translatable("message.routers.exporter.add_importer"), true);
         }
+        if (level != null && !level.isClientSide) {
+            BlockState state = level.getBlockState(worldPosition);
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+        }
+        setChanged();
     }
 
     private int lastRoundRobinIndex = 0;
+    private final Map<BlockPos, Map<BlockPos, Double>> particleProgress = new HashMap<>();
 
     public void tick() {
+        if (level == null || level.isClientSide) return;
+
+        if (level.getGameTime() % 10 == 0) {
+            removeInvalidImporters();
+        }
+
         Direction facing = this.getBlockState().getValue(ImporterBlock.FACING);
         BlockPos targetPos = worldPosition.relative(facing);
         assert level != null;
@@ -559,8 +578,18 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         }
     }
 
-
     public List<BlockPos> getImporterPositions() {
         return importerPositions;
+    }
+
+    public void removeInvalidImporters() {
+        if (level == null || level.isClientSide) return;
+        importerPositions.removeIf(pos -> {
+            BlockEntity be = level.getBlockEntity(pos);
+            return !(be instanceof ImporterBlockEntity);
+        });
+        setChanged();
+        BlockState state = level.getBlockState(worldPosition);
+        level.sendBlockUpdated(worldPosition, state, state, 3);
     }
 }

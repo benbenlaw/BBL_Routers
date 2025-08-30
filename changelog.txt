@@ -1,9 +1,15 @@
 Routers
 
+1.0.8
+Tweaked syncing again to fix desync issues with client not getting the importer positions
+Added particle rendering when holding the connector to view connections
+Fixed Chemical Upgrade Textures
+
 1.0.7
 Changed chemical upgrade recipes
 Added support for Source from Ars Nouveau, uses Source Upgrades, supports round-robin
 Tweaked ordering of upgrades to have item, fluid and energy first with round-robin, modded specific upgrades after
+Removed sync server event not needed as doing on the block interact instead
 
 1.0.6
 Upgrade slots in the Exporter no have empty item background

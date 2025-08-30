@@ -77,6 +77,9 @@ dependencies {
     implementation "curse.maven:ars-nouveau-401955:6827634" // ars nouveau
     implementation "curse.maven:curios-309927:6529130" // curios
     implementation "curse.maven:geckolib-388172:6920810" // geckolib
+    implementation "curse.maven:observable-509575:5733591" // observable
+    implementation "curse.maven:architectury-api-419699:5786327" // architectury
+    implementation "curse.maven:kotlin-for-forge-351264:6497906" // kotlin for forge
 
 }
 
