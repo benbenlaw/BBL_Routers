@@ -1,5 +1,8 @@
 Routers
 
+1.0.9
+Fixed crashing when trying to render the connector particles when chunk is not loaded
+
 1.0.8
 Tweaked syncing again to fix desync issues with client not getting the importer positions
 Added particle rendering when holding the connector to view connections

@@ -46,10 +46,18 @@ public class ClientEvents {
                             Vec3 exporterPos = Vec3.atCenterOf(exporter.getBlockPos());
                             Vec3 importerPos = Vec3.atCenterOf(targetPos);
 
-                            Direction exporterFacing = exporter.getBlockState().getValue(ExporterBlock.FACING);
-                            exporterPos = getAdjustedPos(exporterPos, exporterFacing);
-                            Direction importerFacing = level.getBlockState(targetPos).getValue(ImporterBlock.FACING);
-                            importerPos = getAdjustedPos(importerPos, importerFacing);
+                            if (exporter.getBlockState().getBlock() instanceof ExporterBlock) {
+                                Direction exporterFacing = exporter.getBlockState().getValue(ExporterBlock.FACING);
+                                exporterPos = getAdjustedPos(exporterPos, exporterFacing);
+                            } else {
+                                return;
+                            }
+                            if ( level.getBlockState(targetPos).getBlock() instanceof ImporterBlock) {
+                                Direction importerFacing = level.getBlockState(targetPos).getValue(ImporterBlock.FACING);
+                                importerPos = getAdjustedPos(importerPos, importerFacing);
+                            } else {
+                                return;
+                            }
 
                             // Spawn particle
                             long time = level.getGameTime();
