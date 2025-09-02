@@ -10,10 +10,10 @@
   "group": "strainers",
   "key": {
     "A": {
-      "item": "industrialforegoingsouls:soul_surge"
+      "item": "minecraft:echo_shard"
     },
     "B": {
-      "item": "minecraft:echo_shard"
+      "item": "industrialforegoingsouls:soul_surge"
     }
   },
   "pattern": [

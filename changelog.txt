@@ -1,6 +1,6 @@
 Routers
 
-1.0.10
+1.0.11
 Fixed Changelog URL
 Added Industrial Foregoing Souls support, supports round-robin
 
