@@ -7,6 +7,10 @@ import com.benbenlaw.routers.item.UpgradeItem;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.benbenlaw.routers.screen.util.FluidContainerHelper;
 import com.benbenlaw.routers.util.RoutersTags;
+import com.buuz135.industrialforegoingsouls.block.tile.NetworkBlockEntity;
+import com.buuz135.industrialforegoingsouls.block_network.SoulNetwork;
+import com.buuz135.industrialforegoingsouls.capabilities.ISoulHandler;
+import com.buuz135.industrialforegoingsouls.capabilities.SoulCapabilities;
 import com.hollingsworth.arsnouveau.api.source.ISourceCap;
 import com.hollingsworth.arsnouveau.common.capability.SourceStorage;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
@@ -221,7 +225,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             }
         }
 
-
         // --- Items / Fluids / Chemicals on operation tick ---
         if (level.getGameTime() % speedPerOperation == 0 && targetBlockEntity != null) {
             IItemHandler targetItemHandler = Capabilities.ItemHandler.BLOCK.getCapability(
@@ -236,6 +239,17 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             ISourceCap targetSourceHandler = ModList.get().isLoaded("ars_nouveau")
                     ? CapabilityRegistry.SOURCE_CAPABILITY.getCapability(
                     level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection)
+                    : null;
+
+            ISoulHandler targetSoulHandler = ModList.get().isLoaded("industrialforegoingsouls")
+                    ? SoulCapabilities.BLOCK.getCapability(
+                    level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection)
+                    : null;
+
+            SoulNetwork targetSoulNetwork = ModList.get().isLoaded("industrialforegoingsouls")
+                    ? targetBlockEntity instanceof NetworkBlockEntity<?> networkBlockEntity && networkBlockEntity.getNetwork() instanceof SoulNetwork soulNetwork
+                        ? soulNetwork
+                        : null
                     : null;
 
             // --- Items ---
@@ -302,7 +316,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
-
             // --- Fluids ---
             if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
                 NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
@@ -366,7 +379,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
-
             // --- Chemicals ---
             if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
                 int maxTransfer = getExtractAmount(RoutersTags.Items.CHEMICAL_UPGRADES);
@@ -470,6 +482,56 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
+            // --- Industrial Forgoing Souls Soul ---
+            if (targetSoulHandler != null && hasUpgrade(RoutersTags.Items.SOUL_UPGRADES)) {
+                int maxTransfer = getExtractAmount(RoutersTags.Items.SOUL_UPGRADES);
+
+                if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                    if (!importerPositions.isEmpty()) {
+                        int index = lastRoundRobinIndex % importerPositions.size();
+                        BlockPos importerPos = importerPositions.get(index);
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (be instanceof ImporterBlockEntity importer) {
+                            SoulNetwork importerSoulNetwork = importer.getSoulNetwork() instanceof SoulNetwork soulNet ? soulNet : null;
+                            if (importerSoulNetwork != null) {
+                                int canExtract = targetSoulHandler.drain(maxTransfer, ISoulHandler.Action.SIMULATE);
+                                int available = importerSoulNetwork.getMaxSouls() - importerSoulNetwork.getSoulAmount();
+                                int transferAmount = Math.min(canExtract, available);
+
+                                if (transferAmount > 0) {
+                                    int drained = targetSoulHandler.drain(transferAmount, ISoulHandler.Action.EXECUTE);
+                                    importerSoulNetwork.addSouls(level, drained);
+
+                                    lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                    return;
+                                }
+                            }
+                        }
+                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                    }
+                } else {
+                    for (BlockPos importerPos : importerPositions) {
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                        SoulNetwork importerSoulNetwork = importer.getSoulNetwork() instanceof SoulNetwork soulNet ? soulNet : null;
+                        if (importerSoulNetwork == null) continue;
+
+                        int canExtract = targetSoulHandler.drain(maxTransfer, ISoulHandler.Action.SIMULATE);
+                        int available = importerSoulNetwork.getMaxSouls() - importerSoulNetwork.getSoulAmount();
+                        int transferAmount = Math.min(canExtract, available);
+
+                        if (transferAmount > 0) {
+                            int drained = targetSoulHandler.drain(transferAmount, ISoulHandler.Action.EXECUTE);
+                            importerSoulNetwork.addSouls(level, drained);
+
+                            maxTransfer -= drained;
+                            if (maxTransfer <= 0) break;
+                        }
+                    }
+                }
+            }
+
 
         }
     }

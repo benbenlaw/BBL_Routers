@@ -30,7 +30,13 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
                 .addTag(RoutersTags.Items.SPEED_UPGRADES)
                 .addTag(RoutersTags.Items.ROUND_ROBIN_UPGRADES)
                 .addTag(RoutersTags.Items.SOURCE_UPGRADES)
+                .addTag(RoutersTags.Items.SOUL_UPGRADES)
         ;
+
+        //Soul Upgrades
+        this.tag(RoutersTags.Items.SOUL_UPGRADES).add(
+                RoutersItems.SOUL_UPGRADE.get()
+        );
 
         //Source Upgrades
         this.tag(RoutersTags.Items.SOURCE_UPGRADES).add(

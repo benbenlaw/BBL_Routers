@@ -66,6 +66,9 @@ public class RoutersItems {
     public static final DeferredItem<Item> SOURCE_UPGRADE_4 = ITEMS.register("source_upgrade_4",
             () -> new UpgradeItem(new Item.Properties(), StartupConfig.sourcePerOperation4.get()));
 
+    public static final DeferredItem<Item> SOUL_UPGRADE = ITEMS.register("soul_upgrade",
+            () -> new UpgradeItem(new Item.Properties(), 10));
+
 
 
 

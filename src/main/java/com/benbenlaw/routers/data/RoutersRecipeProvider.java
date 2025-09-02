@@ -2,6 +2,7 @@ package com.benbenlaw.routers.data;
 
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.item.RoutersItems;
+import com.buuz135.industrialforegoingsouls.IndustrialForegoingSouls;
 import com.hollingsworth.arsnouveau.ArsNouveau;
 import com.hollingsworth.arsnouveau.common.items.ModItem;
 import com.hollingsworth.arsnouveau.common.lib.LibItemNames;
@@ -355,6 +356,17 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.NETHERITE_INGOT))
                 .save(consumer.withConditions(new ModLoadedCondition("ars_nouveau")));
+
+        //Soul Upgrade
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.SOUL_UPGRADE.get())
+                .pattern(" A ")
+                .pattern("ABA")
+                .pattern(" A ")
+                .define('A', Items.ECHO_SHARD)
+                .define('B', IndustrialForegoingSouls.SOUL_SURGE_BLOCK.getBlock())
+                .group("strainers")
+                .unlockedBy("has_item", has(IndustrialForegoingSouls.SOUL_SURGE_BLOCK.getBlock()))
+                .save(consumer.withConditions(new ModLoadedCondition("industrialforegoingsouls")));
     }
 
 }

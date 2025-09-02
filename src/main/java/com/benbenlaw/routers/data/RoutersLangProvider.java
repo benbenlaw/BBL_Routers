@@ -49,7 +49,7 @@ public class RoutersLangProvider extends LanguageProvider {
         addItemTranslation("source_upgrade_3", "Source Upgrade III");
         addItemTranslation("source_upgrade_4", "Source Upgrade IV");
 
-
+        addItemTranslation("soul_upgrade", "Soul Upgrade");
 
         addItemTranslation("round_robin_upgrade", "Round Robin Upgrade");
 
@@ -74,6 +74,8 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("speed_upgrade", "Allows Extraction of from the Exporter every %s Ticks");
         addTooltipsTranslation("source_upgrade", "Allows Extraction of Ars Nouveau Source from the Exporter at %s Per Operation");
         addTooltipsTranslation("round_robin_upgrade", "Extractor distributes in order evenly between multiple Importers");
+        addTooltipsTranslation("soul_upgrade", "Allows Extraction of Industrial Forgoing Souls Soul from the Exporter at 10 Per Operation, Importer must be connected to a Soul Surge");
+
         addTooltipsTranslation("router_connector", "Right Click on an Importer to set the position then Right Click on an Exporter to link them. Right Click to unlink.");
         addTooltipsTranslation("exporter", "Does nothing on its own, used to extract from the connected inventory to a connected Importer(s). Use Upgrades to allow different types of extraction.");
         addTooltipsTranslation("importer", "Does nothing on its own, used to insert into the connected inventory from a connected Exporter.");

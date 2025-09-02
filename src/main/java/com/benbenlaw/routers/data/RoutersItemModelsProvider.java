@@ -50,6 +50,7 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
         simpleItem(RoutersItems.SOURCE_UPGRADE_4);
 
         simpleItem(RoutersItems.ROUND_ROBIN_UPGRADE);
+        simpleItem(RoutersItems.SOUL_UPGRADE);
 
     }
 

@@ -4,6 +4,10 @@ import com.benbenlaw.routers.block.ImporterBlock;
 import com.benbenlaw.routers.integration.RoutersCapabilities;
 import com.benbenlaw.routers.screen.ImporterMenu;
 import com.benbenlaw.routers.screen.util.FluidContainerHelper;
+import com.buuz135.industrialforegoingsouls.block.tile.NetworkBlockEntity;
+import com.buuz135.industrialforegoingsouls.block_network.SoulNetwork;
+import com.buuz135.industrialforegoingsouls.capabilities.ISoulHandler;
+import com.buuz135.industrialforegoingsouls.capabilities.SoulCapabilities;
 import com.hollingsworth.arsnouveau.api.source.ISourceCap;
 import com.hollingsworth.arsnouveau.common.capability.SourceStorage;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
@@ -43,6 +47,8 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     private IEnergyStorage energyStorage;
     private IChemicalHandler chemicalHandler;
     private ISourceCap sourceStorage;
+    private ISoulHandler soulHandler;
+    private SoulNetwork soulNetwork;
     public final ContainerData data;
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
@@ -125,6 +131,16 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
                     setSourceHandler(sourceHandler);
                 }
             }
+
+            if (ModList.get().isLoaded("industrialforegoingsouls")) {
+                ISoulHandler soulHandler = SoulCapabilities.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
+                if (soulHandler != null) {
+                    setSourceHandler(soulHandler);
+                }
+                if (targetBlockEntity instanceof NetworkBlockEntity<?> networkBlockEntity && networkBlockEntity.getNetwork() instanceof SoulNetwork soulNetwork) {
+                    setSoulNetwork(soulNetwork);
+                }
+            }
         }
     }
 
@@ -168,6 +184,21 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         this.sourceStorage = handler;
     }
 
+    public ISoulHandler getSoulHandler() {
+        return soulHandler;
+    }
+
+    public void setSourceHandler(ISoulHandler handler) {
+        this.soulHandler = handler;
+    }
+
+    public SoulNetwork getSoulNetwork() {
+        return soulNetwork;
+    }
+
+    public void setSoulNetwork(SoulNetwork soulNetwork) {
+        this.soulNetwork = soulNetwork;
+    }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider p_323910_) {

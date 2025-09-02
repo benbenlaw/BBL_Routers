@@ -61,6 +61,10 @@ public class RoutersCreativeTab {
                     output.accept(RoutersItems.SOURCE_UPGRADE_4);
                 }
 
+                if (ModList.get().isLoaded("industrialforegoingsouls")){
+                    output.accept(RoutersItems.SOUL_UPGRADE);
+                }
+
 
             }).build());
 }

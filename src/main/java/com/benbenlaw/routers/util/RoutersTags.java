@@ -21,6 +21,7 @@ public class RoutersTags {
         public static final TagKey<Item> SPEED_UPGRADES = tag("speed_upgrades");
         public static final TagKey<Item> SOURCE_UPGRADES = tag("source_upgrades");
         public static final TagKey<Item> ROUND_ROBIN_UPGRADES = tag("round_robin_upgrades");
+        public static final TagKey<Item> SOUL_UPGRADES = tag("soul_upgrades");
 
 
 

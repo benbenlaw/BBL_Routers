@@ -80,6 +80,8 @@ dependencies {
     implementation "curse.maven:observable-509575:5733591" // observable
     implementation "curse.maven:architectury-api-419699:5786327" // architectury
     implementation "curse.maven:kotlin-for-forge-351264:6497906" // kotlin for forge
+    implementation "curse.maven:industrial-foregoing-266515:6626624" // Industrial Foregoing
+    implementation "curse.maven:industrial-foregoing-souls-904394:6151480" // Industrial Foregoing Souls
 
 }
 
