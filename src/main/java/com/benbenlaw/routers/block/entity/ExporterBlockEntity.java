@@ -262,30 +262,83 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             if (targetItemHandler != null && hasUpgrade(RoutersTags.Items.ITEM_UPGRADES)) {
 
                 List<Item> expandedExporterFilters = expandFilters(getFilters());
+
                 int maxTransfer = getExtractAmount(RoutersTags.Items.ITEM_UPGRADES);
 
                 for (int slot = 0; slot < targetItemHandler.getSlots(); slot++) {
                     ItemStack extracted = targetItemHandler.extractItem(slot, maxTransfer, true);
                     if (extracted.isEmpty()) continue;
 
+                    // Use expanded filter list here
                     boolean allowByExporter = expandedExporterFilters.isEmpty() ||
                             expandedExporterFilters.contains(extracted.getItem());
                     if (!allowByExporter) continue;
 
-                    boolean inserted;
                     if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
-                        inserted = tryInsertItemStack(extracted, importerPositions, true);
-                    } else {
-                        inserted = tryInsertItemStack(extracted, importerPositions, false);
-                    }
+                        if (!importerPositions.isEmpty()) {
+                            int attempts = 0;
+                            int index = lastRoundRobinIndex % importerPositions.size();
 
-                    // Actually remove items from source if insertion succeeded
-                    if (inserted) {
-                        targetItemHandler.extractItem(slot, maxTransfer - extracted.getCount(), false);
+                            while (attempts < importerPositions.size()) {
+                                BlockPos importerPos = importerPositions.get(index);
+                                BlockEntity be = level.getBlockEntity(importerPos);
+
+                                if (be instanceof ImporterBlockEntity importer) {
+                                    IItemHandler importerHandler = importer.getTargetHandler();
+                                    if (importerHandler != null) {
+                                        List<Item> expandedImporterFilters = expandFilters(importer.getFilters());
+
+                                        boolean allowByImporter = expandedImporterFilters.isEmpty() ||
+                                                expandedImporterFilters.contains(extracted.getItem());
+
+                                        if (allowByImporter) {
+                                            ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
+                                            int inserted = extracted.getCount() - remainder.getCount();
+                                            if (inserted > 0) {
+                                                targetItemHandler.extractItem(slot, inserted, false);
+                                                lastRoundRobinIndex = (index + 1) % importerPositions.size();
+                                                return; // Done transferring this item
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Move to next importer
+                                index = (index + 1) % importerPositions.size();
+                                attempts++;
+                            }
+
+                            // If we get here, item could not be inserted into any importer
+                            lastRoundRobinIndex = index;
+                        }
+                    } else {
+                        for (BlockPos importerPos : importerPositions) {
+                            BlockEntity be = level.getBlockEntity(importerPos);
+                            if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                            IItemHandler importerHandler = importer.getTargetHandler();
+                            if (importerHandler == null) continue;
+
+                            NonNullList<ItemStack> importerFilters = importer.getFilters();
+
+                            // Build expanded importer filter list
+                            List<Item> expandedImporterFilters = expandFilters(importer.getFilters());
+
+
+                            boolean allowByImporter = expandedImporterFilters.isEmpty() ||
+                                    expandedImporterFilters.contains(extracted.getItem());
+                            if (!allowByImporter) continue;
+
+                            ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
+                            int inserted = extracted.getCount() - remainder.getCount();
+                            if (inserted > 0) {
+                                targetItemHandler.extractItem(slot, inserted, false);
+                                return;
+                            }
+                        }
                     }
                 }
             }
-
             // --- Fluids ---
             if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
                 NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
@@ -599,45 +652,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                 }
             }
         }
-    }
-    private boolean tryInsertItemStack(ItemStack stack, List<BlockPos> importers, boolean roundRobin) {
-        if (importers.isEmpty() || stack.isEmpty()) return false;
-
-        int startIndex = roundRobin ? lastRoundRobinIndex % importers.size() : 0;
-        int attempts = 0;
-        int index = startIndex;
-
-        while (attempts < importers.size()) {
-            BlockPos pos = importers.get(index);
-            BlockEntity be = level.getBlockEntity(pos);
-
-            if (be instanceof ImporterBlockEntity importer) {
-                IItemHandler handler = importer.getTargetHandler();
-                if (handler != null) {
-                    List<Item> expandedImporterFilters = expandFilters(importer.getFilters());
-                    boolean allow = expandedImporterFilters.isEmpty() ||
-                            expandedImporterFilters.contains(stack.getItem());
-
-                    if (allow) {
-                        ItemStack remainder = ItemHandlerHelper.insertItem(handler, stack, false);
-                        int inserted = stack.getCount() - remainder.getCount();
-                        if (inserted > 0) {
-                            stack.shrink(inserted); // update remaining stack
-                            if (roundRobin) lastRoundRobinIndex = (index + 1) % importers.size();
-                            return true; // item inserted
-                        }
-                    }
-                }
-            }
-
-            // Move to next importer
-            index = (index + 1) % importers.size();
-            attempts++;
-        }
-
-        // If round-robin, update lastRoundRobinIndex even if nothing inserted
-        if (roundRobin) lastRoundRobinIndex = index;
-        return false; // no insertion happened
     }
 
     private List<Item> expandFilters(NonNullList<ItemStack> filters) {

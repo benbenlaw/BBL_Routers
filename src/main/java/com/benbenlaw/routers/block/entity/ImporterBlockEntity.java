@@ -69,7 +69,6 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     private IHeatExchangerLogic heatHandlerPC;
     public final ContainerData data;
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
-    private final List<TagKey<Item>> tagFilters = new ArrayList<>();
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
 
     @Override
@@ -106,10 +105,6 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
 
     public NonNullList<ItemStack> getFilters() {
         return filters;
-    }
-
-    public List<TagKey<Item>> getTagFilters() {
-        return tagFilters;
     }
 
     public NonNullList<FluidStack> getFluidFilters() {
@@ -273,17 +268,6 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         super.saveAdditional(compoundTag, provider);
 
         ContainerHelper.saveAllItems(compoundTag, this.filters, provider);
-
-        ListTag tagList = new ListTag();
-        for (TagKey<Item> tag : tagFilters) {
-            if (tag != null) {
-                CompoundTag tagCompound = new CompoundTag();
-                tagCompound.putString("tag", tag.location().toString());
-                tagList.add(tagCompound);
-            }
-        }
-        compoundTag.put("TagFilters", tagList);
-
         FluidContainerHelper.saveAllFluids(compoundTag, this.fluidFilters, true, provider);
 
         if (extractorPos != null) {
@@ -298,17 +282,6 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         super.loadAdditional(compoundTag, provider);
 
         ContainerHelper.loadAllItems(compoundTag, this.filters, provider);
-
-        tagFilters.clear();
-        if (compoundTag.contains("TagFilters")) {
-            ListTag listTag = compoundTag.getList("TagFilters", Tag.TAG_COMPOUND);
-            for (int i = 0; i < listTag.size(); i++) {
-                CompoundTag tagCompound = listTag.getCompound(i);
-                ResourceLocation rl = ResourceLocation.parse(tagCompound.getString("tag"));
-                tagFilters.add(TagKey.create(Registries.ITEM, rl));
-            }
-        }
-
         FluidContainerHelper.loadAllFluids(compoundTag, this.fluidFilters, provider);
 
         if (compoundTag.contains("extractorX") && compoundTag.contains("extractorY") && compoundTag.contains("extractorZ")) {

@@ -367,6 +367,30 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .group("strainers")
                 .unlockedBy("has_item", has(IndustrialForegoingSouls.SOUL_SURGE_BLOCK.getBlock()))
                 .save(consumer.withConditions(new ModLoadedCondition("industrialforegoingsouls")));
+
+        //Tag Filter
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.TAG_FILTER.get())
+                .pattern(" A ")
+                .pattern("CBC")
+                .pattern(" A ")
+                .define('A', Items.PAPER)
+                .define('B', RoutersItems.ITEM_UPGRADE_1)
+                .define('C', Items.HOPPER)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.COMPARATOR))
+                .save(consumer);
+
+        //Mod Filter
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.MOD_FILTER.get())
+                .pattern(" C ")
+                .pattern("ABA")
+                .pattern(" C ")
+                .define('A', Items.PAPER)
+                .define('B', RoutersItems.ITEM_UPGRADE_1)
+                .define('C', Items.HOPPER)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.COMPARATOR))
+                .save(consumer);
     }
 
 }

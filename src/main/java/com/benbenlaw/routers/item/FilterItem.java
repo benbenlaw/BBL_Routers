@@ -52,12 +52,20 @@ public class FilterItem extends Item {
         if (Screen.hasShiftDown()) {
 
             if (stack.is(RoutersItems.TAG_FILTER)) {
-                ResourceLocation tag = stack.getOrDefault(RoutersDataComponents.TAG_FILTER.get(), ResourceLocation.parse("rightclicktoset"));
-                components.add(Component.translatable("tooltip.routers.tag_filter", tag.toString()).withStyle(ChatFormatting.YELLOW));
+                if (stack.has(RoutersDataComponents.TAG_FILTER.get())) {
+                    ResourceLocation tag = stack.get(RoutersDataComponents.TAG_FILTER.get());
+                    components.add(Component.translatable("tooltip.routers.tag_filter", tag).withStyle(ChatFormatting.YELLOW));
+                } else {
+                    components.add(Component.translatable("tooltip.routers.tag_filter_empty").withStyle(ChatFormatting.YELLOW));
+                }
             }
             if (stack.is(RoutersItems.MOD_FILTER)) {
-                String mod = stack.getOrDefault(RoutersDataComponents.MOD_FILTER.get(), "Right Click to set");
-                components.add(Component.translatable("tooltip.routers.mod_filter", mod).withStyle(ChatFormatting.YELLOW));
+                if (stack.has(RoutersDataComponents.MOD_FILTER.get())) {
+                    String mod = stack.get(RoutersDataComponents.MOD_FILTER.get());
+                    components.add(Component.translatable("tooltip.routers.mod_filter", mod).withStyle(ChatFormatting.YELLOW));
+                } else {
+                    components.add(Component.translatable("tooltip.routers.mod_filter_empty").withStyle(ChatFormatting.YELLOW));
+                }
             }
 
         } else {
