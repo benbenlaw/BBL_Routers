@@ -46,6 +46,8 @@ public class RoutersCreativeTab {
                 output.accept(RoutersItems.SPEED_UPGRADE_4);
 
                 output.accept(RoutersItems.ROUND_ROBIN_UPGRADE);
+                output.accept(RoutersItems.MOD_FILTER);
+                output.accept(RoutersItems.TAG_FILTER);
 
                 if (ModList.get().isLoaded("mekanism")){
                     output.accept(RoutersItems.CHEMICAL_UPGRADE_1);
@@ -65,11 +67,16 @@ public class RoutersCreativeTab {
                     output.accept(RoutersItems.SOUL_UPGRADE);
                 }
 
+                //DISABLE FOR NOW, NEEDS TESTING
+                /*
                 if (ModList.get().isLoaded("pneumaticcraft")){
                     output.accept(RoutersItems.PRESSURE_UPGRADE);
                     output.accept(RoutersItems.ADVANCED_PRESSURE_UPGRADE);
                     output.accept(RoutersItems.HEAT_UPGRADE_PC);
                 }
+                 */
+
+
 
 
             }).build());

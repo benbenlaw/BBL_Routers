@@ -3,18 +3,15 @@ package com.benbenlaw.routers.screen;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
-import com.benbenlaw.routers.item.FilterItem;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -141,24 +138,15 @@ public class ExporterMenu extends AbstractContainerMenu {
                 ghostSlot.set(ItemStack.EMPTY);
                 ghostSlot.setFluid(fluid.get());
             } else if (!carried.isEmpty()) {
-                if (carried.getItem() instanceof FilterItem filterItem) {
-                    // this is a tag filter
-                    TagKey<Item> tag = filterItem.getTag(carried);
-                    if (tag != null) {
-                        blockEntity.getTagFilters().set(slotId, tag);
-                    }
-                    blockEntity.getFilters().set(slotId, ItemStack.EMPTY); // don't duplicate into item filter list
-                    blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
-                    ghostSlot.set(ItemStack.EMPTY);
-                    ghostSlot.setFluid(FluidStack.EMPTY);
-                } else {
-                    // normal item filter
-                    blockEntity.getFilters().set(slotId, carried.copyWithCount(1));
-                    blockEntity.getTagFilters().set(slotId, null);
-                    blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
-                    ghostSlot.set(carried.copyWithCount(1));
-                    ghostSlot.setFluid(FluidStack.EMPTY);
-                }
+                blockEntity.getFilters().set(slotId, carried.copyWithCount(1));
+                blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
+                ghostSlot.set(carried.copyWithCount(1));
+                ghostSlot.setFluid(FluidStack.EMPTY);
+            } else {
+                blockEntity.getFilters().set(slotId, ItemStack.EMPTY);
+                blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
+                ghostSlot.set(ItemStack.EMPTY);
+                ghostSlot.setFluid(FluidStack.EMPTY);
             }
             blockEntity.setChanged();
         }

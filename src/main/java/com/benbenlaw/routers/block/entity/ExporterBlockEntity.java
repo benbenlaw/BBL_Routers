@@ -3,6 +3,8 @@ package com.benbenlaw.routers.block.entity;
 import com.benbenlaw.routers.block.ImporterBlock;
 import com.benbenlaw.routers.config.StartupConfig;
 import com.benbenlaw.routers.integration.RoutersCapabilities;
+import com.benbenlaw.routers.item.RoutersDataComponents;
+import com.benbenlaw.routers.item.RoutersItems;
 import com.benbenlaw.routers.item.UpgradeItem;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.benbenlaw.routers.screen.util.FluidContainerHelper;
@@ -25,6 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -32,6 +35,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.ContainerHelper;
@@ -256,68 +260,32 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
             // --- Items ---
             if (targetItemHandler != null && hasUpgrade(RoutersTags.Items.ITEM_UPGRADES)) {
-                NonNullList<ItemStack> exporterFilters = getFilters();
+
+                List<Item> expandedExporterFilters = expandFilters(getFilters());
                 int maxTransfer = getExtractAmount(RoutersTags.Items.ITEM_UPGRADES);
 
                 for (int slot = 0; slot < targetItemHandler.getSlots(); slot++) {
                     ItemStack extracted = targetItemHandler.extractItem(slot, maxTransfer, true);
                     if (extracted.isEmpty()) continue;
 
-                    boolean allowByExporter = exporterFilters.stream().allMatch(ItemStack::isEmpty) ||
-                            exporterFilters.stream().anyMatch(f -> !f.isEmpty() &&
-                                    ItemStack.isSameItemSameComponents(f, extracted));
+                    boolean allowByExporter = expandedExporterFilters.isEmpty() ||
+                            expandedExporterFilters.contains(extracted.getItem());
                     if (!allowByExporter) continue;
 
+                    boolean inserted;
                     if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
-                        if (!importerPositions.isEmpty()) {
-                            int index = lastRoundRobinIndex % importerPositions.size();
-                            BlockPos importerPos = importerPositions.get(index);
-                            BlockEntity be = level.getBlockEntity(importerPos);
-                            if (be instanceof ImporterBlockEntity importer) {
-                                IItemHandler importerHandler = importer.getTargetHandler();
-                                if (importerHandler != null) {
-                                    NonNullList<ItemStack> importerFilters = importer.getFilters();
-                                    boolean allowByImporter = importerFilters.stream().allMatch(ItemStack::isEmpty) ||
-                                            importerFilters.stream().anyMatch(f -> !f.isEmpty() &&
-                                                    ItemStack.isSameItemSameComponents(f, extracted));
-
-                                    if (allowByImporter) {
-                                        ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
-                                        int inserted = extracted.getCount() - remainder.getCount();
-                                        if (inserted > 0) {
-                                            targetItemHandler.extractItem(slot, inserted, false);
-                                            lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                            lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
-                        }
+                        inserted = tryInsertItemStack(extracted, importerPositions, true);
                     } else {
-                        for (BlockPos importerPos : importerPositions) {
-                            BlockEntity be = level.getBlockEntity(importerPos);
-                            if (!(be instanceof ImporterBlockEntity importer)) continue;
+                        inserted = tryInsertItemStack(extracted, importerPositions, false);
+                    }
 
-                            IItemHandler importerHandler = importer.getTargetHandler();
-                            if (importerHandler == null) continue;
-
-                            NonNullList<ItemStack> importerFilters = importer.getFilters();
-                            boolean allowByImporter = importerFilters.stream().allMatch(ItemStack::isEmpty) ||
-                                    importerFilters.stream().anyMatch(f -> !f.isEmpty() &&
-                                            ItemStack.isSameItemSameComponents(f, extracted));
-                            if (!allowByImporter) continue;
-
-                            ItemStack remainder = ItemHandlerHelper.insertItem(importerHandler, extracted, false);
-                            int inserted = extracted.getCount() - remainder.getCount();
-                            if (inserted > 0) {
-                                targetItemHandler.extractItem(slot, inserted, false);
-                                return;
-                            }
-                        }
+                    // Actually remove items from source if insertion succeeded
+                    if (inserted) {
+                        targetItemHandler.extractItem(slot, maxTransfer - extracted.getCount(), false);
                     }
                 }
             }
+
             // --- Fluids ---
             if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
                 NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
@@ -572,8 +540,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
-
-
             // --- PneumaticCraft Heat Transfer ---
             if (!importerPositions.isEmpty() && hasUpgrade(RoutersTags.Items.HEAT_UPGRADES_PC) && targetHeatHandler.isPresent()) {
                 IHeatExchangerLogic sourceHeatHandler = targetHeatHandler.get();
@@ -634,6 +600,79 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             }
         }
     }
+    private boolean tryInsertItemStack(ItemStack stack, List<BlockPos> importers, boolean roundRobin) {
+        if (importers.isEmpty() || stack.isEmpty()) return false;
+
+        int startIndex = roundRobin ? lastRoundRobinIndex % importers.size() : 0;
+        int attempts = 0;
+        int index = startIndex;
+
+        while (attempts < importers.size()) {
+            BlockPos pos = importers.get(index);
+            BlockEntity be = level.getBlockEntity(pos);
+
+            if (be instanceof ImporterBlockEntity importer) {
+                IItemHandler handler = importer.getTargetHandler();
+                if (handler != null) {
+                    List<Item> expandedImporterFilters = expandFilters(importer.getFilters());
+                    boolean allow = expandedImporterFilters.isEmpty() ||
+                            expandedImporterFilters.contains(stack.getItem());
+
+                    if (allow) {
+                        ItemStack remainder = ItemHandlerHelper.insertItem(handler, stack, false);
+                        int inserted = stack.getCount() - remainder.getCount();
+                        if (inserted > 0) {
+                            stack.shrink(inserted); // update remaining stack
+                            if (roundRobin) lastRoundRobinIndex = (index + 1) % importers.size();
+                            return true; // item inserted
+                        }
+                    }
+                }
+            }
+
+            // Move to next importer
+            index = (index + 1) % importers.size();
+            attempts++;
+        }
+
+        // If round-robin, update lastRoundRobinIndex even if nothing inserted
+        if (roundRobin) lastRoundRobinIndex = index;
+        return false; // no insertion happened
+    }
+
+    private List<Item> expandFilters(NonNullList<ItemStack> filters) {
+        List<Item> expanded = new ArrayList<>();
+        for (ItemStack filter : filters) {
+            if (filter.isEmpty()) continue;
+
+            if (filter.is(RoutersItems.TAG_FILTER)) {
+                // Expand tag filter
+                TagKey<Item> tagKey = TagKey.create(Registries.ITEM, Objects.requireNonNull(filter.get(RoutersDataComponents.TAG_FILTER.get())));
+                assert level != null;
+                level.registryAccess()
+                        .registryOrThrow(Registries.ITEM)
+                        .getTag(tagKey)
+                        .ifPresent(tagSet -> tagSet.forEach(holder -> expanded.add(holder.value())));
+            } else if (filter.is(RoutersItems.MOD_FILTER)) {
+                String modId = filter.get(RoutersDataComponents.MOD_FILTER.get());
+                if (modId != null && !modId.isEmpty()) {
+                    assert level != null;
+                    level.registryAccess()
+                            .registryOrThrow(Registries.ITEM)
+                            .forEach(item -> {
+                                ResourceLocation id = level.registryAccess().registryOrThrow(Registries.ITEM).getKey(item);
+                                if (id != null && id.getNamespace().equals(modId)) {
+                                    expanded.add(item);
+                                }
+                            });
+                }
+            }else {
+                expanded.add(filter.getItem());
+            }
+        }
+        return expanded;
+    }
+
 
 
     public int getSpeedPerOperation() {

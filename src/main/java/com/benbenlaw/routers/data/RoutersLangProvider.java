@@ -52,6 +52,8 @@ public class RoutersLangProvider extends LanguageProvider {
         addItemTranslation("soul_upgrade", "Soul Upgrade");
 
         addItemTranslation("round_robin_upgrade", "Round Robin Upgrade");
+        addItemTranslation("mod_filter", "Mod Filter");
+        addItemTranslation("tag_filter", "Tag Filter");
 
         addItemTranslation("pressure_upgrade", "Basic Pressure Upgrade");
         addItemTranslation("advanced_pressure_upgrade", "Advanced Pressure Upgrade");
@@ -79,8 +81,8 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("source_upgrade", "Allows Extraction of Ars Nouveau Source from the Exporter at %s Per Operation");
         addTooltipsTranslation("round_robin_upgrade", "Extractor distributes in order evenly between multiple Importers");
         addTooltipsTranslation("soul_upgrade", "Allows Extraction of Industrial Forgoing Souls Soul from the Exporter at 10 Per Operation, Importer must be connected to a Soul Surge");
-        addTooltipsTranslation("tag_filter", "Tag: %s");
-        addTooltipsTranslation("mod_filter", "Mod: %s");
+        addTooltipsTranslation("tag_filter", "Allows for everything from a tag to be moved, Tag: %s");
+        addTooltipsTranslation("mod_filter", "Allows for everything from a mod to be moved, Mod: %s");
 
         addTooltipsTranslation("mod_filter_upgrade", "Right Click to open, allows filtering by Mod");
         addTooltipsTranslation("tag_filter_upgrade", "Right Click to open, allows filtering by Tag");
@@ -92,6 +94,7 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("exporter_filter_slots", "Empty Item/Fluid Filter");
         addTooltipsTranslation("exporter_upgrades_slots", "Upgrade Slot");
 
+        add("screen.routers.config_screen", "Set Filter");
 
     }
 

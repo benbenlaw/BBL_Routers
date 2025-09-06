@@ -51,13 +51,13 @@ public class FilterItem extends Item {
 
         if (Screen.hasShiftDown()) {
 
-            if (stack.is(RoutersItems.TAG_FILTER) && stack.has(RoutersDataComponents.TAG_FILTER.get())) {
-                ResourceLocation tag = stack.get(RoutersDataComponents.TAG_FILTER.get());
-                assert tag != null;
+            if (stack.is(RoutersItems.TAG_FILTER)) {
+                ResourceLocation tag = stack.getOrDefault(RoutersDataComponents.TAG_FILTER.get(), ResourceLocation.parse("rightclicktoset"));
                 components.add(Component.translatable("tooltip.routers.tag_filter", tag.toString()).withStyle(ChatFormatting.YELLOW));
             }
             if (stack.is(RoutersItems.MOD_FILTER)) {
-                components.add(Component.translatable("tooltip.routers.mod_filter").withStyle(ChatFormatting.YELLOW));
+                String mod = stack.getOrDefault(RoutersDataComponents.MOD_FILTER.get(), "Right Click to set");
+                components.add(Component.translatable("tooltip.routers.mod_filter", mod).withStyle(ChatFormatting.YELLOW));
             }
 
         } else {
@@ -68,6 +68,11 @@ public class FilterItem extends Item {
 
     public void setTag(ItemStack stack, ResourceLocation tag) {
         stack.set(RoutersDataComponents.TAG_FILTER.get(), tag);
+        PacketDistributor.sendToServer(new FilterItemUpdate(stack));
+    }
+
+    public void setMod(ItemStack stack, String mod) {
+        stack.set(RoutersDataComponents.MOD_FILTER.get(), mod);
         PacketDistributor.sendToServer(new FilterItemUpdate(stack));
     }
 
