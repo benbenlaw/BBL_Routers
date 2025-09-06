@@ -69,6 +69,18 @@ public class RoutersItems {
     public static final DeferredItem<Item> SOUL_UPGRADE = ITEMS.register("soul_upgrade",
             () -> new UpgradeItem(new Item.Properties(), 10));
 
+    public static final DeferredItem<Item> PRESSURE_UPGRADE = ITEMS.register("pressure_upgrade",
+            () -> new UpgradeItem(new Item.Properties(), 5));
+    public static final DeferredItem<Item> ADVANCED_PRESSURE_UPGRADE = ITEMS.register("advanced_pressure_upgrade",
+            () -> new UpgradeItem(new Item.Properties(), 20));
+    public static final DeferredItem<Item> HEAT_UPGRADE_PC = ITEMS.register("heat_upgrade_pc",
+            () -> new UpgradeItem(new Item.Properties(), 5));
+
+    public static final DeferredItem<Item> MOD_FILTER = ITEMS.register("mod_filter",
+            () -> new FilterItem(new Item.Properties()));
+    public static final DeferredItem<Item> TAG_FILTER = ITEMS.register("tag_filter",
+            () -> new FilterItem(new Item.Properties()));
+
 
 
 

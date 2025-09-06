@@ -9,6 +9,7 @@ import com.benbenlaw.routers.item.RoutersCreativeTab;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
 import com.benbenlaw.routers.networking.RoutersNetworking;
+import com.benbenlaw.routers.screen.ConfigScreen;
 import com.benbenlaw.routers.screen.ExporterScreen;
 import com.benbenlaw.routers.screen.ImporterScreen;
 import com.benbenlaw.routers.screen.RoutersMenuTypes;
@@ -58,6 +59,8 @@ public class Routers {
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(RoutersMenuTypes.EXPORTER_MENU.get(), ExporterScreen::new);
             event.register(RoutersMenuTypes.IMPORTER_MENU.get(), ImporterScreen::new);
+            event.register(RoutersMenuTypes.CONFIG_MENU.get(), ConfigScreen::new);
+
 
         }
 

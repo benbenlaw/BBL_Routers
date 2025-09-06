@@ -65,6 +65,12 @@ public class RoutersCreativeTab {
                     output.accept(RoutersItems.SOUL_UPGRADE);
                 }
 
+                if (ModList.get().isLoaded("pneumaticcraft")){
+                    output.accept(RoutersItems.PRESSURE_UPGRADE);
+                    output.accept(RoutersItems.ADVANCED_PRESSURE_UPGRADE);
+                    output.accept(RoutersItems.HEAT_UPGRADE_PC);
+                }
+
 
             }).build());
 }

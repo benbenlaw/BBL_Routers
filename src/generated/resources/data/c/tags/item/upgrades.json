@@ -7,6 +7,8 @@
     "#routers:speed_upgrades",
     "#routers:round_robin_upgrades",
     "#routers:source_upgrades",
-    "#routers:soul_upgrades"
+    "#routers:soul_upgrades",
+    "#routers:pressure_upgrades",
+    "#routers:heat_upgrades_pc"
   ]
 }

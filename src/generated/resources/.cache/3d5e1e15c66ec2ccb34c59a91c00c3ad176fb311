@@ -1,8 +1,10 @@
-// 1.21.1	2025-09-02T08:46:44.3887354	Tags for minecraft:item mod id routers
-c27a2a04d99ae849977f03ae6611fad16809144a data/c/tags/item/upgrades.json
+// 1.21.1	2025-09-06T11:43:53.1101751	Tags for minecraft:item mod id routers
+060b681658c2238e98e5033864fb1e09d4ea3cb4 data/c/tags/item/upgrades.json
 0035398d17663efe6105a88d4a7afd8725951fe3 data/routers/tags/item/chemical_upgrades.json
 f3956fc3da6dd7ba994e44e9a6764b4d1409debe data/routers/tags/item/fluid_upgrades.json
+fbf9e7496719a4e0730a1915575981bfa8c36711 data/routers/tags/item/heat_upgrades_pc.json
 d277f9227e8496c3b41d83d7ccbb7869b111a5f5 data/routers/tags/item/item_upgrades.json
+b1601393075bfbc69c836004ce29ef49a6427d35 data/routers/tags/item/pressure_upgrades.json
 846f4628026f98cd8362f558fb7605d20ac34ee7 data/routers/tags/item/rf_upgrades.json
 5446cf4dd821d9fe464f4ef4c168a3c8a983a0cf data/routers/tags/item/round_robin_upgrades.json
 7341d39734a1b3b7444c16c1b41018baa7338d8a data/routers/tags/item/soul_upgrades.json

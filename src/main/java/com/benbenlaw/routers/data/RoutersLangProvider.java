@@ -53,6 +53,10 @@ public class RoutersLangProvider extends LanguageProvider {
 
         addItemTranslation("round_robin_upgrade", "Round Robin Upgrade");
 
+        addItemTranslation("pressure_upgrade", "Basic Pressure Upgrade");
+        addItemTranslation("advanced_pressure_upgrade", "Advanced Pressure Upgrade");
+        addItemTranslation("heat_upgrade_pc", "Heat Upgrade (PneumaticCraft)");
+
 
 
         //Blocks
@@ -75,6 +79,12 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("source_upgrade", "Allows Extraction of Ars Nouveau Source from the Exporter at %s Per Operation");
         addTooltipsTranslation("round_robin_upgrade", "Extractor distributes in order evenly between multiple Importers");
         addTooltipsTranslation("soul_upgrade", "Allows Extraction of Industrial Forgoing Souls Soul from the Exporter at 10 Per Operation, Importer must be connected to a Soul Surge");
+        addTooltipsTranslation("tag_filter", "Tag: %s");
+        addTooltipsTranslation("mod_filter", "Mod: %s");
+
+        addTooltipsTranslation("mod_filter_upgrade", "Right Click to open, allows filtering by Mod");
+        addTooltipsTranslation("tag_filter_upgrade", "Right Click to open, allows filtering by Tag");
+
 
         addTooltipsTranslation("router_connector", "Right Click on an Importer to set the position then Right Click on an Exporter to link them. Right Click to unlink.");
         addTooltipsTranslation("exporter", "Does nothing on its own, used to extract from the connected inventory to a connected Importer(s). Use Upgrades to allow different types of extraction.");

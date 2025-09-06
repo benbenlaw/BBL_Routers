@@ -1,9 +1,7 @@
 package com.benbenlaw.routers.util;
 
 import com.benbenlaw.routers.Routers;
-import de.maxhenkel.pipez.corelib.tag.ItemTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -22,6 +20,9 @@ public class RoutersTags {
         public static final TagKey<Item> SOURCE_UPGRADES = tag("source_upgrades");
         public static final TagKey<Item> ROUND_ROBIN_UPGRADES = tag("round_robin_upgrades");
         public static final TagKey<Item> SOUL_UPGRADES = tag("soul_upgrades");
+        public static final TagKey<Item> PRESSURE_UPGRADES = tag("pressure_upgrades");
+        public static final TagKey<Item> HEAT_UPGRADES_PC = tag("heat_upgrades_pc");
+        public static final TagKey<Item> FILTERS = tag("filters");
 
 
 

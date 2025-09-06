@@ -14,6 +14,9 @@ import com.buuz135.industrialforegoingsouls.capabilities.SoulCapabilities;
 import com.hollingsworth.arsnouveau.api.source.ISourceCap;
 import com.hollingsworth.arsnouveau.common.capability.SourceStorage;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
+import me.desht.pneumaticcraft.api.PNCCapabilities;
+import me.desht.pneumaticcraft.api.heat.IHeatExchangerLogic;
+import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
 import mekanism.api.Action;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
@@ -56,10 +59,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IAttachmentHolder {
@@ -246,11 +246,13 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection)
                     : null;
 
-            SoulNetwork targetSoulNetwork = ModList.get().isLoaded("industrialforegoingsouls")
-                    ? targetBlockEntity instanceof NetworkBlockEntity<?> networkBlockEntity && networkBlockEntity.getNetwork() instanceof SoulNetwork soulNetwork
-                        ? soulNetwork
-                        : null
-                    : null;
+            Optional<IAirHandlerMachine> targetAirHandler = ModList.get().isLoaded("pneumaticcraft")
+                    ? PNCCapabilities.getAirHandler(targetBlockEntity, inputDirection)
+                    : Optional.empty();
+
+            Optional<IHeatExchangerLogic> targetHeatHandler = ModList.get().isLoaded("pneumaticcraft")
+                    ? PNCCapabilities.getHeatLogic(targetBlockEntity, inputDirection)
+                    : Optional.empty();
 
             // --- Items ---
             if (targetItemHandler != null && hasUpgrade(RoutersTags.Items.ITEM_UPGRADES)) {
@@ -531,8 +533,105 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
+            // --- PneumaticCraft Air Transfer ---
+            if (!importerPositions.isEmpty() && hasUpgrade(RoutersTags.Items.PRESSURE_UPGRADES) && targetAirHandler.isPresent()) {
+                int maxTransfer = getExtractAmount(RoutersTags.Items.PRESSURE_UPGRADES);
+
+                if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                    if (!importerPositions.isEmpty()) {
+                        int index = lastRoundRobinIndex % importerPositions.size();
+                        BlockPos importerPos = importerPositions.get(index);
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (be instanceof ImporterBlockEntity importer) {
+                            IAirHandlerMachine importerSource = importer.getPressureHandler();
+                            if (importerSource != null) {
+                                if (maxTransfer > 0) {
+                                    targetAirHandler.get().addAir(-maxTransfer);
+                                    importerSource.addAir(maxTransfer);
+                                    lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                                    return;
+                                }
+                            }
+                        }
+                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                    }
+                } else {
+                    for (BlockPos importerPos : importerPositions) {
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                        IAirHandlerMachine importerSource = importer.getPressureHandler();
+                        if (importerSource == null) continue;
+
+                        if (maxTransfer > 0) {
+                            targetAirHandler.get().addAir(-maxTransfer);
+                            importerSource.addAir(maxTransfer);
+                            importerSource.setConnectableFaces(Collections.singleton(importer.getBlockState().getValue(ImporterBlock.FACING).getOpposite()));
+                            break;
+                        }
+                    }
+                }
+            }
 
 
+            // --- PneumaticCraft Heat Transfer ---
+            if (!importerPositions.isEmpty() && hasUpgrade(RoutersTags.Items.HEAT_UPGRADES_PC) && targetHeatHandler.isPresent()) {
+                IHeatExchangerLogic sourceHeatHandler = targetHeatHandler.get();
+                double maxHeatTransfer = getExtractAmount(RoutersTags.Items.HEAT_UPGRADES_PC);
+
+                if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
+                    int startIndex = lastRoundRobinIndex % importerPositions.size();
+
+                    for (int i = 0; i < importerPositions.size() && maxHeatTransfer > 0; i++) {
+                        int index = (startIndex + i) % importerPositions.size();
+                        BlockPos importerPos = importerPositions.get(index);
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                        IHeatExchangerLogic importerHeatHandler = PNCCapabilities.getHeatLogic(be, null).orElse(null);
+                        if (importerHeatHandler == null) continue;
+
+                        double sourceTemp = sourceHeatHandler.getTemperature();
+                        double targetTemp = importerHeatHandler.getTemperature();
+                        double heatDifference = sourceTemp - targetTemp;
+
+                        if (heatDifference <= 0) continue;
+
+                        double transferAmount = Math.min(maxHeatTransfer, heatDifference);
+
+                        sourceHeatHandler.addHeat(-transferAmount);
+                        importerHeatHandler.addHeat(transferAmount);
+                        maxHeatTransfer -= transferAmount;
+
+                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                        break; // only one per tick in round-robin
+                    }
+
+                } else {
+                    // Non-round-robin: iterate all importers
+                    for (BlockPos importerPos : importerPositions) {
+                        if (maxHeatTransfer <= 0) break;
+
+                        BlockEntity be = level.getBlockEntity(importerPos);
+                        if (!(be instanceof ImporterBlockEntity importer)) continue;
+
+                        IHeatExchangerLogic importerHeatHandler = PNCCapabilities.getHeatLogic(be, null).orElse(null);
+                        if (importerHeatHandler == null) continue;
+
+                        double sourceTemp = sourceHeatHandler.getTemperature();
+                        double targetTemp = importerHeatHandler.getTemperature();
+                        double heatDifference = sourceTemp - targetTemp;
+
+                        if (heatDifference <= 0) continue;
+
+                        double transferAmount = Math.min(maxHeatTransfer, heatDifference);
+
+                        sourceHeatHandler.addHeat(-transferAmount);
+                        importerHeatHandler.addHeat(transferAmount);
+                        maxHeatTransfer -= transferAmount;
+                    }
+                }
+            }
         }
     }
 

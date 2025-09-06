@@ -82,6 +82,7 @@ dependencies {
     implementation "curse.maven:kotlin-for-forge-351264:6497906" // kotlin for forge
     implementation "curse.maven:industrial-foregoing-266515:6626624" // Industrial Foregoing
     implementation "curse.maven:industrial-foregoing-souls-904394:6151480" // Industrial Foregoing Souls
+    implementation "curse.maven:pneumaticcraft-repressurized-281849:6817362" // PneumaticCraft: Repressurized
 
 }
 

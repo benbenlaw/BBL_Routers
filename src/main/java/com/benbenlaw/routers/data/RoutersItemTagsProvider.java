@@ -31,7 +31,20 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
                 .addTag(RoutersTags.Items.ROUND_ROBIN_UPGRADES)
                 .addTag(RoutersTags.Items.SOURCE_UPGRADES)
                 .addTag(RoutersTags.Items.SOUL_UPGRADES)
+                .addTag(RoutersTags.Items.PRESSURE_UPGRADES)
+                .addTag(RoutersTags.Items.HEAT_UPGRADES_PC)
         ;
+
+        //Heat Upgrades PC
+        this.tag(RoutersTags.Items.HEAT_UPGRADES_PC).add(
+                RoutersItems.HEAT_UPGRADE_PC.get()
+        );
+
+        //Pressure Upgrades
+        this.tag(RoutersTags.Items.PRESSURE_UPGRADES).add(
+                RoutersItems.PRESSURE_UPGRADE.get(),
+                RoutersItems.ADVANCED_PRESSURE_UPGRADE.get()
+        );
 
         //Soul Upgrades
         this.tag(RoutersTags.Items.SOUL_UPGRADES).add(
