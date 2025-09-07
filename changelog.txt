@@ -1,5 +1,8 @@
 Routers
 
+1.0.16
+Added Yuki Textures for mod and tag filter
+
 1.0.15
 Added Mod Filter and Tag Filter. These filters can be set by right clicking the item, it opens a gui to type in either the mod or tag you want
 Valid tags/mods will show as green in the search box and items from the tag/mod will show in the gui
