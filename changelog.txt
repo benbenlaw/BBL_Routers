@@ -1,5 +1,9 @@
 Routers
 
+1.0.17
+Improved exporter for fluids, should no longer "delete" fluids when the upgrade amount was higher than the amount in the tank. This
+    only effect oritech as far as I know
+
 1.0.16
 Added Yuki Textures for mod and tag filter
 

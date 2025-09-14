@@ -368,8 +368,9 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                                     if (allowByImporter) {
                                         int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
                                         if (canReceive > 0) {
-                                            FluidStack extracted = targetFluidHandler.drain(canReceive, IFluidHandler.FluidAction.EXECUTE);
-                                            importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
+                                            int drainAmount = Math.min(canReceive, simulatedDrain.getAmount());
+                                            FluidStack request = new FluidStack(simulatedDrain.getFluidHolder(), drainAmount);
+                                            FluidStack extracted = targetFluidHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);                                            importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
                                             lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
                                             return;
                                         }
@@ -395,7 +396,10 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                             int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
                             if (canReceive <= 0) continue;
 
-                            FluidStack extracted = targetFluidHandler.drain(canReceive, IFluidHandler.FluidAction.EXECUTE);
+                            int drainAmount = Math.min(canReceive, simulatedDrain.getAmount());
+                            FluidStack request = new FluidStack(simulatedDrain.getFluidHolder(), drainAmount);
+                            FluidStack extracted = targetFluidHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);
+
                             importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
                             return;
                         }

@@ -83,6 +83,11 @@ dependencies {
     implementation "curse.maven:industrial-foregoing-266515:6626624" // Industrial Foregoing
     implementation "curse.maven:industrial-foregoing-souls-904394:6151480" // Industrial Foregoing Souls
     implementation "curse.maven:pneumaticcraft-repressurized-281849:6817362" // PneumaticCraft: Repressurized
+    implementation "curse.maven:oritech-1030830:6807350" // Botania
+    implementation "curse.maven:athena-841890:6669522" // Athena
+    implementation "curse.maven:owo-lib-532610:6785734" // owo-lib
+    implementation "curse.maven:geckolib-388172:6920810" // GeckoLib
+
 
 }
 
