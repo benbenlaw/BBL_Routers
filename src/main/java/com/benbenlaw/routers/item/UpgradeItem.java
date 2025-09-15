@@ -67,6 +67,9 @@ public class UpgradeItem extends Item {
             if (stack.is(RoutersTags.Items.HEAT_UPGRADES_PC)) {
                 components.add(Component.translatable("tooltip.routers.heat_upgrade_pc", extractValuePerOperation).withStyle(ChatFormatting.YELLOW));
             }
+            if (stack.is(RoutersTags.Items.DIMENSIONAL_UPGRADES)) {
+                components.add(Component.translatable("tooltip.routers.dimensional_upgrade").withStyle(ChatFormatting.YELLOW));
+            }
         } else {
             components.add(Component.translatable("tooltip.routers.hold_shift").withStyle(ChatFormatting.YELLOW));
         }

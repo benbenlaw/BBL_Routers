@@ -68,6 +68,7 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     private IAirHandlerMachine pressureHandler;
     private IHeatExchangerLogic heatHandlerPC;
     public final ContainerData data;
+    private String dimension = "";
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
 
@@ -103,6 +104,15 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         };
     }
 
+    public String getDimension() {
+        return dimension;
+    }
+
+    public String setDimension(String dimension) {
+        return this.dimension = dimension;
+    }
+
+
     public NonNullList<ItemStack> getFilters() {
         return filters;
     }
@@ -121,6 +131,11 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         Direction inputDirection = facing.getOpposite();
 
         if (level.getGameTime() % 20 != 0) return;
+
+        if (dimension == null || dimension.isEmpty()) {
+            dimension = level.dimension().location().toString();
+            setChanged();
+        }
 
         if (targetBlockEntity != null) {
             IItemHandler itemHandler = Capabilities.ItemHandler.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
@@ -275,6 +290,9 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
             compoundTag.putInt("extractorY", extractorPos.getY());
             compoundTag.putInt("extractorZ", extractorPos.getZ());
         }
+
+        compoundTag.putString("dimension", dimension);
+
     }
 
     @Override
@@ -289,5 +307,8 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         } else {
             extractorPos = null;
         }
+
+        dimension = compoundTag.getString("dimension");
+
     }
 }

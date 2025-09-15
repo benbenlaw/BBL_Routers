@@ -9,6 +9,7 @@
     "#routers:source_upgrades",
     "#routers:soul_upgrades",
     "#routers:pressure_upgrades",
-    "#routers:heat_upgrades_pc"
+    "#routers:heat_upgrades_pc",
+    "#routers:dimensional_upgrades"
   ]
 }

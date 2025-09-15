@@ -1,5 +1,10 @@
 Routers
 
+1.0.18
+Importers and Export now save there dimension
+Added Dimensional Upgrade, allows the exporter to export to importers in other dimensions
+Fixed crash with tag tooltips
+
 1.0.17
 Improved exporter for fluids, should no longer "delete" fluids when the upgrade amount was higher than the amount in the tank. This
     only effect oritech as far as I know

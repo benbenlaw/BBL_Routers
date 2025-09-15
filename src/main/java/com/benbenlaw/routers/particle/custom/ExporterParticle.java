@@ -1,4 +1,4 @@
-package com.benbenlaw.routers.block.particle.custom;
+package com.benbenlaw.routers.particle.custom;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;

@@ -23,6 +23,7 @@ public class RoutersTags {
         public static final TagKey<Item> PRESSURE_UPGRADES = tag("pressure_upgrades");
         public static final TagKey<Item> HEAT_UPGRADES_PC = tag("heat_upgrades_pc");
         public static final TagKey<Item> FILTERS = tag("filters");
+        public static final TagKey<Item> DIMENSIONAL_UPGRADES = tag("dimensional_upgrades");
 
 
 

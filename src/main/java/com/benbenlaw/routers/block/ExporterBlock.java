@@ -183,7 +183,6 @@ public class ExporterBlock extends BaseEntityBlock {
         return ItemInteractionResult.SUCCESS;
     }
 
-
     /* FACING */
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {

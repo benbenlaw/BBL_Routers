@@ -48,6 +48,7 @@ public class RoutersCreativeTab {
                 output.accept(RoutersItems.ROUND_ROBIN_UPGRADE);
                 output.accept(RoutersItems.MOD_FILTER);
                 output.accept(RoutersItems.TAG_FILTER);
+                output.accept(RoutersItems.DIMENSIONAL_UPGRADE);
 
                 if (ModList.get().isLoaded("mekanism")){
                     output.accept(RoutersItems.CHEMICAL_UPGRADE_1);

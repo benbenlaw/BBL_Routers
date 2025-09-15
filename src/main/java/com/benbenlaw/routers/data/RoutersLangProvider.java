@@ -54,6 +54,7 @@ public class RoutersLangProvider extends LanguageProvider {
         addItemTranslation("round_robin_upgrade", "Round Robin Upgrade");
         addItemTranslation("mod_filter", "Mod Filter");
         addItemTranslation("tag_filter", "Tag Filter");
+        addItemTranslation("dimensional_upgrade", "Dimensional Upgrade");
 
         addItemTranslation("pressure_upgrade", "Basic Pressure Upgrade");
         addItemTranslation("advanced_pressure_upgrade", "Advanced Pressure Upgrade");
@@ -85,6 +86,7 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("mod_filter_empty", "Right Click to open, allows filtering by Tag");
         addTooltipsTranslation("tag_filter", "Tag: %s");
         addTooltipsTranslation("mod_filter", "Mod: %s");
+        addTooltipsTranslation("dimensional_upgrade", "Allows the Exporter to extract to Importers in other Dimensions");
 
 
 

@@ -1,7 +1,6 @@
-package com.benbenlaw.routers.block.particle;
+package com.benbenlaw.routers.particle;
 
-import com.benbenlaw.routers.Routers;
-import com.benbenlaw.routers.block.particle.custom.ExporterParticle;
+import com.benbenlaw.routers.particle.custom.ExporterParticle;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;

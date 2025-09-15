@@ -54,7 +54,8 @@ public class FilterItem extends Item {
             if (stack.is(RoutersItems.TAG_FILTER)) {
                 if (stack.has(RoutersDataComponents.TAG_FILTER.get())) {
                     ResourceLocation tag = stack.get(RoutersDataComponents.TAG_FILTER.get());
-                    components.add(Component.translatable("tooltip.routers.tag_filter", tag).withStyle(ChatFormatting.YELLOW));
+                    assert tag != null;
+                    components.add(Component.translatable("tooltip.routers.tag_filter", tag.toString()).withStyle(ChatFormatting.YELLOW));
                 } else {
                     components.add(Component.translatable("tooltip.routers.tag_filter_empty").withStyle(ChatFormatting.YELLOW));
                 }

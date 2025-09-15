@@ -33,7 +33,13 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
                 .addTag(RoutersTags.Items.SOUL_UPGRADES)
                 .addTag(RoutersTags.Items.PRESSURE_UPGRADES)
                 .addTag(RoutersTags.Items.HEAT_UPGRADES_PC)
+                .addTag(RoutersTags.Items.DIMENSIONAL_UPGRADES)
         ;
+
+        //Dimensional Upgrades
+        this.tag(RoutersTags.Items.DIMENSIONAL_UPGRADES).add(
+                RoutersItems.DIMENSIONAL_UPGRADE.get()
+        );
 
         //Heat Upgrades PC
         this.tag(RoutersTags.Items.HEAT_UPGRADES_PC).add(

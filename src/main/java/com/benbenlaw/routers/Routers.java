@@ -2,8 +2,7 @@ package com.benbenlaw.routers;
 
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
-import com.benbenlaw.routers.block.entity.client.ExporterBlockEntityRenderer;
-import com.benbenlaw.routers.block.particle.RoutersParticles;
+import com.benbenlaw.routers.particle.RoutersParticles;
 import com.benbenlaw.routers.config.StartupConfig;
 import com.benbenlaw.routers.item.RoutersCreativeTab;
 import com.benbenlaw.routers.item.RoutersDataComponents;
@@ -23,7 +22,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
