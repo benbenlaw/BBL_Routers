@@ -72,6 +72,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
     private List<BlockPos> importerPositions;
     public final ContainerData data;
     private String dimension = "";
+    private final Map<BlockPos, ImporterBlockEntity> importerCache = new HashMap<>();
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
     private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
@@ -204,7 +205,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                 if (!importerPositions.isEmpty()) {
                     int index = lastRoundRobinIndex % importerPositions.size();
                     BlockPos importerPos = importerPositions.get(index);
-                    BlockEntity be = level.getBlockEntity(importerPos);
+                    BlockEntity be = findImporter(importerPos);
                     if (be instanceof ImporterBlockEntity importer) {
                         IEnergyStorage importerEnergy = importer.getEnergyStorage();
                         if (importerEnergy != null) {
@@ -294,7 +295,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
                             while (attempts < importerPositions.size()) {
                                 BlockPos importerPos = importerPositions.get(index);
-                                BlockEntity be = level.getBlockEntity(importerPos);
+                                BlockEntity be = findImporter(importerPos);
 
                                 if (be instanceof ImporterBlockEntity importer) {
                                     IItemHandler importerHandler = importer.getTargetHandler();
@@ -370,7 +371,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                         if (!importerPositions.isEmpty()) {
                             int index = lastRoundRobinIndex % importerPositions.size();
                             BlockPos importerPos = importerPositions.get(index);
-                            BlockEntity be = level.getBlockEntity(importerPos);
+                            BlockEntity be = findImporter(importerPos);
                             if (be instanceof ImporterBlockEntity importer) {
                                 IFluidHandler importerFluid = importer.getFluidHandler();
                                 if (importerFluid != null) {
@@ -427,7 +428,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     if (!importerPositions.isEmpty()) {
                         int index = lastRoundRobinIndex % importerPositions.size();
                         BlockPos importerPos = importerPositions.get(index);
-                        BlockEntity be = level.getBlockEntity(importerPos);
+                        BlockEntity be = findImporter(importerPos);
                         if (be instanceof ImporterBlockEntity importer) {
                             IChemicalHandler importerChemical = importer.getChemicalHandler();
                             if (importerChemical != null) {
@@ -485,7 +486,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     if (!importerPositions.isEmpty()) {
                         int index = lastRoundRobinIndex % importerPositions.size();
                         BlockPos importerPos = importerPositions.get(index);
-                        BlockEntity be = level.getBlockEntity(importerPos);
+                        BlockEntity be = findImporter(importerPos);
                         if (be instanceof ImporterBlockEntity importer) {
                             ISourceCap importerSource = importer.getSourceHandler();
                             if (importerSource != null) {
@@ -530,7 +531,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     if (!importerPositions.isEmpty()) {
                         int index = lastRoundRobinIndex % importerPositions.size();
                         BlockPos importerPos = importerPositions.get(index);
-                        BlockEntity be = level.getBlockEntity(importerPos);
+                        BlockEntity be = findImporter(importerPos);
                         if (be instanceof ImporterBlockEntity importer) {
                             SoulNetwork importerSoulNetwork = importer.getSoulNetwork() instanceof SoulNetwork soulNet ? soulNet : null;
                             if (importerSoulNetwork != null) {
@@ -579,7 +580,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     if (!importerPositions.isEmpty()) {
                         int index = lastRoundRobinIndex % importerPositions.size();
                         BlockPos importerPos = importerPositions.get(index);
-                        BlockEntity be = level.getBlockEntity(importerPos);
+                        BlockEntity be = findImporter(importerPos);
                         if (be instanceof ImporterBlockEntity importer) {
                             IAirHandlerMachine importerSource = importer.getPressureHandler();
                             if (importerSource != null) {
@@ -673,30 +674,38 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
     @Nullable
     private ImporterBlockEntity findImporter(BlockPos pos) {
+        // Check cache first
+        ImporterBlockEntity cached = importerCache.get(pos);
+        if (cached != null && !cached.isRemoved()) {
+            return cached;
+        }
+
         if (!(this.level instanceof ServerLevel serverLevel)) return null;
         MinecraftServer server = serverLevel.getServer();
-
         boolean allowCrossDim = hasUpgrade(RoutersTags.Items.DIMENSIONAL_UPGRADES);
 
         if (allowCrossDim) {
-            // Check all loaded dimensions
+            // Search across all loaded dimensions
             for (ServerLevel candidate : server.getAllLevels()) {
                 BlockEntity be = candidate.getBlockEntity(pos);
                 if (be instanceof ImporterBlockEntity importer) {
+                    // Verify stored importer dimension matches candidate world
                     String importerDim = importer.getDimension();
                     String candidateDim = candidate.dimension().location().toString();
                     if (importerDim.equals(candidateDim)) {
+                        importerCache.put(pos, importer); // cache result
                         return importer;
                     }
                 }
             }
         } else {
-            // Restrict to same dimension only
+            // Restrict search to current dimension only
             BlockEntity be = serverLevel.getBlockEntity(pos);
             if (be instanceof ImporterBlockEntity importer) {
                 String importerDim = importer.getDimension();
                 String expectedDim = serverLevel.dimension().location().toString();
                 if (importerDim.equals(expectedDim)) {
+                    importerCache.put(pos, importer); // cache result
                     return importer;
                 }
             }
@@ -704,6 +713,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
         return null;
     }
+
 
     private List<Item> expandFilters(NonNullList<ItemStack> filters) {
         List<Item> expanded = new ArrayList<>();
@@ -854,28 +864,27 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
     public void removeInvalidImporters() {
         if (!(level instanceof ServerLevel serverLevel)) return;
         MinecraftServer server = serverLevel.getServer();
+        boolean allowCrossDim = hasUpgrade(RoutersTags.Items.DIMENSIONAL_UPGRADES);
 
         importerPositions.removeIf(pos -> {
-            boolean foundValid = false;
-
-            for (ServerLevel candidate : server.getAllLevels()) {
-                BlockEntity be = candidate.getBlockEntity(pos);
-                if (be instanceof ImporterBlockEntity importer) {
-                    String importerDim = importer.getDimension();
-                    String candidateDim = candidate.dimension().location().toString();
-
-                    if (importerDim.equals(candidateDim)) {
-                        foundValid = true;
-                        break;
+            if (allowCrossDim) {
+                for (ServerLevel candidate : server.getAllLevels()) {
+                    if (candidate.getBlockEntity(pos) instanceof ImporterBlockEntity importer &&
+                            importer.getDimension().equals(candidate.dimension().location().toString())) {
+                        return false;
                     }
                 }
+                return true;
+            } else {
+                return !(serverLevel.getBlockEntity(pos) instanceof ImporterBlockEntity importer) ||
+                        !importer.getDimension().equals(serverLevel.dimension().location().toString());
             }
-            return !foundValid;
         });
 
         setChanged();
         BlockState state = level.getBlockState(worldPosition);
         level.sendBlockUpdated(worldPosition, state, state, 3);
     }
+
 
 }
