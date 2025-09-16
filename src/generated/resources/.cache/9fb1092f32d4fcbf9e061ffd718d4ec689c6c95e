@@ -1,8 +1,9 @@
-// 1.21.1	2025-09-06T16:46:34.4848172	Recipes
+// 1.21.1	2025-09-15T16:04:42.5586672	Recipes
 12e9c9fc77e69421a894f00b74d04e19ede93ca6 data/routers/advancement/recipes/misc/chemical_upgrade_1.json
 0bf6fe447cb5dc50659300b3f93508e59b06c1b6 data/routers/advancement/recipes/misc/chemical_upgrade_2.json
 cb1bb62b885e6848b2ec84ae6f0b600ed511d0d8 data/routers/advancement/recipes/misc/chemical_upgrade_3.json
 e2729f481e8d7d4af9ca1cb5a64a43c7fb1a6f4c data/routers/advancement/recipes/misc/chemical_upgrade_4.json
+dca788e818e3d4fa3207e77bd5e9f1267b27627e data/routers/advancement/recipes/misc/dimensional_upgrade.json
 c1a2678c763af7bfd1eecd1278bc3fd0c14369af data/routers/advancement/recipes/misc/exporter_block.json
 6fd2d5f5b2cac6b6c5cc66f1d7a60548afcf5d9d data/routers/advancement/recipes/misc/fluid_upgrade_1.json
 1cae84d0f32f23d8521ff1b77753d81c3b94d006 data/routers/advancement/recipes/misc/fluid_upgrade_2.json
@@ -34,6 +35,7 @@ c68b914ac90d8a8faf86c29dbfb74c3f52d2a929 data/routers/advancement/recipes/misc/s
 a1c9f1f41715ea538a213146b1975a0994d03996 data/routers/recipe/chemical_upgrade_2.json
 a4ff50c7fbf44cf4b09d73e0a2c6727509401627 data/routers/recipe/chemical_upgrade_3.json
 f217d80395260ceed247f49e00a27c797c22cb2b data/routers/recipe/chemical_upgrade_4.json
+cbd87caa6c785587e551d159bb8532e31a53809f data/routers/recipe/dimensional_upgrade.json
 8da8e7e003af8c7360762d2211445f863bc73c70 data/routers/recipe/exporter_block.json
 b5963c470446ef773e56beea416554f7757211c0 data/routers/recipe/fluid_upgrade_1.json
 4ac55b8842f76377daf51567f2f4cec158a14ef3 data/routers/recipe/fluid_upgrade_2.json

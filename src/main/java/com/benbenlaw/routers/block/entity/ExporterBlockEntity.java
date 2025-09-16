@@ -356,22 +356,29 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             // --- Fluids ---
             if (targetFluidHandler != null && hasUpgrade(RoutersTags.Items.FLUID_UPGRADES)) {
                 NonNullList<FluidStack> exporterFluidFilters = getFluidFilters();
+                int maxTransfer = getExtractAmount(RoutersTags.Items.FLUID_UPGRADES);
 
+                // Check each tank individually
                 for (int slot = 0; slot < targetFluidHandler.getTanks(); slot++) {
-                    int maxTransfer = getExtractAmount(RoutersTags.Items.FLUID_UPGRADES);
-                    FluidStack simulatedDrain = targetFluidHandler.drain(maxTransfer, IFluidHandler.FluidAction.SIMULATE);
-                    if (simulatedDrain.isEmpty()) continue;
+                    FluidStack tankFluid = targetFluidHandler.getFluidInTank(slot);
+                    if (tankFluid.isEmpty()) continue;
 
+                    // Only consider up to maxTransfer amount
+                    FluidStack simulatedDrain = new FluidStack(tankFluid.getFluidHolder(), Math.min(maxTransfer, tankFluid.getAmount()));
+
+                    // Exporter filter check
                     boolean allowByExporter = exporterFluidFilters.stream().allMatch(FluidStack::isEmpty) ||
                             exporterFluidFilters.stream().anyMatch(f -> !f.isEmpty() &&
                                     FluidStack.isSameFluidSameComponents(f, simulatedDrain));
                     if (!allowByExporter) continue;
 
+                    // Handle round-robin mode
                     if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
                         if (!importerPositions.isEmpty()) {
                             int index = lastRoundRobinIndex % importerPositions.size();
                             BlockPos importerPos = importerPositions.get(index);
                             BlockEntity be = findImporter(importerPos);
+
                             if (be instanceof ImporterBlockEntity importer) {
                                 IFluidHandler importerFluid = importer.getFluidHandler();
                                 if (importerFluid != null) {
@@ -382,11 +389,13 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                                     if (allowByImporter) {
                                         int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
                                         if (canReceive > 0) {
-                                            int drainAmount = Math.min(canReceive, simulatedDrain.getAmount());
-                                            FluidStack request = new FluidStack(simulatedDrain.getFluidHolder(), drainAmount);
-                                            FluidStack extracted = targetFluidHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);                                            importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
+                                            // Drain exactly what importer can take
+                                            FluidStack request = new FluidStack(simulatedDrain.getFluid(), canReceive);
+                                            FluidStack extracted = targetFluidHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);
+                                            importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
+
                                             lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
-                                            return;
+                                            return; // stop after successful transfer
                                         }
                                     }
                                 }
@@ -394,6 +403,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                             lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
                         }
                     } else {
+                        // Normal (non round-robin) mode
                         for (BlockPos importerPos : importerPositions) {
                             ImporterBlockEntity importer = findImporter(importerPos);
                             if (importer == null) continue;
@@ -410,16 +420,17 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                             int canReceive = importerFluid.fill(simulatedDrain, IFluidHandler.FluidAction.SIMULATE);
                             if (canReceive <= 0) continue;
 
-                            int drainAmount = Math.min(canReceive, simulatedDrain.getAmount());
-                            FluidStack request = new FluidStack(simulatedDrain.getFluidHolder(), drainAmount);
+                            // Drain exactly what importer can take
+                            FluidStack request = new FluidStack(simulatedDrain.getFluid(), canReceive);
                             FluidStack extracted = targetFluidHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);
 
                             importerFluid.fill(extracted, IFluidHandler.FluidAction.EXECUTE);
-                            return;
+                            return; // stop after successful transfer
                         }
                     }
                 }
             }
+
             // --- Chemicals ---
             if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
                 int maxTransfer = getExtractAmount(RoutersTags.Items.CHEMICAL_UPGRADES);

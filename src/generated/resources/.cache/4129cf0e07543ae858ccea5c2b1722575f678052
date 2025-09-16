@@ -1,8 +1,9 @@
-// 1.21.1	2025-09-06T16:46:34.4827793	routers Item Models
+// 1.21.1	2025-09-15T16:04:42.5565584	routers Item Models
 cdc169fc04bad0ed1b2baa163e5f5e710448386a assets/routers/models/item/chemical_upgrade_1.json
 afc620126a6c7afbe059c37f12b9059a71dd1015 assets/routers/models/item/chemical_upgrade_2.json
 daa142f7dba4a890b2a522b16a464943a0e5e318 assets/routers/models/item/chemical_upgrade_3.json
 4d1237a4254765be4344f26460d42c0b47bfd3d6 assets/routers/models/item/chemical_upgrade_4.json
+a782b05c60fae59f41493467fa9073adc10e96dc assets/routers/models/item/dimensional_upgrade.json
 286b4618113f644f264c3988be7c1b930fa9897d assets/routers/models/item/fluid_upgrade_1.json
 d4f9882149a9d3e0c3640305d0d5ca5f48116ef4 assets/routers/models/item/fluid_upgrade_2.json
 7510af723739a454bd6a5d789471ae3cca4886b8 assets/routers/models/item/fluid_upgrade_3.json

@@ -1,5 +1,11 @@
 Routers
 
+1.0.21
+Fluid Exporter now checks all fluid in an handler instead of just the first one
+
+1.0.20
+Exporters and Importer can now be waterlogged
+
 1.0.19
 Fixed round-robin not working with importers in other dimensions
 Improved performance of Exporter again

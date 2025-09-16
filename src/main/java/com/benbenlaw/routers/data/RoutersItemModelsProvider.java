@@ -53,6 +53,7 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
         simpleItem(RoutersItems.MOD_FILTER);
         simpleItem(RoutersItems.TAG_FILTER);
         simpleItem(RoutersItems.SOUL_UPGRADE);
+        simpleItem(RoutersItems.DIMENSIONAL_UPGRADE);
 
     }
 

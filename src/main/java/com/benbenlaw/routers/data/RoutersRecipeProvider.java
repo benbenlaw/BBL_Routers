@@ -391,6 +391,18 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .group("strainers")
                 .unlockedBy("has_item", has(Items.COMPARATOR))
                 .save(consumer);
+
+        //Dimensional Upgrade
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RoutersItems.DIMENSIONAL_UPGRADE.get())
+                .pattern("CAC")
+                .pattern("ABA")
+                .pattern("CAC")
+                .define('A', Items.ENDER_PEARL)
+                .define('B', Items.ENDER_EYE)
+                .define('C', Items.IRON_INGOT)
+                .group("strainers")
+                .unlockedBy("has_item", has(Items.ENDER_EYE))
+                .save(consumer);
     }
 
 }
