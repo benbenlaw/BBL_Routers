@@ -41,6 +41,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -137,6 +138,30 @@ public class ImporterBlock extends BaseEntityBlock implements SimpleWaterloggedB
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(WATERLOGGED, false));
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos pos1, boolean p_60514_) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof ImporterBlockEntity entity) {
+            entity.setFluidHandler(null);
+            entity.setItemHandler(null);
+            entity.setEnergyStorage(null);
+            if (ModList.get().isLoaded("mekanism")) {
+                entity.setChemicalHandler(null);
+            }
+            if (ModList.get().isLoaded("ars_nouveau")) {
+                entity.setSourceHandler(null);
+            }
+            if (ModList.get().isLoaded("industrialforegoingsouls")) {
+                entity.setSoulNetwork(null);
+                entity.setSoulHandler(null);
+            }
+            if (ModList.get().isLoaded("pneumaticcraft")) {
+                entity.setHeatHandlerPC(null);
+                entity.setPressureHandler(null);
+            }
+        }
     }
 
     @Override

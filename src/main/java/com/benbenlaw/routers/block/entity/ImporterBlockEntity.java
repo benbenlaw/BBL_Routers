@@ -9,9 +9,7 @@ import com.buuz135.industrialforegoingsouls.block_network.SoulNetwork;
 import com.buuz135.industrialforegoingsouls.capabilities.ISoulHandler;
 import com.buuz135.industrialforegoingsouls.capabilities.SoulCapabilities;
 import com.hollingsworth.arsnouveau.api.source.ISourceCap;
-import com.hollingsworth.arsnouveau.common.capability.SourceStorage;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
-import me.desht.pneumaticcraft.api.PNCCapabilities;
 import me.desht.pneumaticcraft.api.heat.IHeatExchangerLogic;
 import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
 import mekanism.api.chemical.IChemicalHandler;
@@ -19,23 +17,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,10 +39,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import static me.desht.pneumaticcraft.api.PNCCapabilities.AIR_HANDLER_MACHINE;
 import static me.desht.pneumaticcraft.api.PNCCapabilities.HEAT_EXCHANGER_BLOCK;
@@ -168,7 +156,7 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
             if (ModList.get().isLoaded("industrialforegoingsouls")) {
                 ISoulHandler soulHandler = SoulCapabilities.BLOCK.getCapability(level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
                 if (soulHandler != null) {
-                    setSourceHandler(soulHandler);
+                    setSoulHandler(soulHandler);
                 }
                 if (targetBlockEntity instanceof NetworkBlockEntity<?> networkBlockEntity && networkBlockEntity.getNetwork() instanceof SoulNetwork soulNetwork) {
                     setSoulNetwork(soulNetwork);
@@ -233,7 +221,7 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         return soulHandler;
     }
 
-    public void setSourceHandler(ISoulHandler handler) {
+    public void setSoulHandler(ISoulHandler handler) {
         this.soulHandler = handler;
     }
 
