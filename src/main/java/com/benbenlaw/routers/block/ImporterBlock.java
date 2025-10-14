@@ -4,9 +4,11 @@ import com.benbenlaw.routers.block.entity.ImporterBlockEntity;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
+import com.benbenlaw.routers.networking.packets.SyncChemicalListToClient;
 import com.benbenlaw.routers.networking.packets.SyncFluidListToClient;
 import com.benbenlaw.routers.screen.ImporterMenu;
 import com.mojang.serialization.MapCodec;
+import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -201,6 +203,9 @@ public class ImporterBlock extends BaseEntityBlock implements SimpleWaterloggedB
                         Component.translatable("block.routers.importer_block")), (buf -> buf.writeBlockPos(blockPos)));
 
                 PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncFluidListToClient(blockPos, importer.getFluidFilters()));
+                if (ModList.get().isLoaded("mekanism")) {
+                    PacketDistributor.sendToPlayer((ServerPlayer) player, new SyncChemicalListToClient(blockPos, (List<ChemicalStack>) importer.getChemicalFilters()));
+                }
             }
         }
 

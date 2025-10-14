@@ -1,5 +1,11 @@
 Routers
 
+1.0.23
+- Connector now tagged as a wrench
+- Searching wrench in JEI now shows the connector
+- Fixed player gui empty slots showing as upgrade slots in exporter
+- Mekanism chemicals can now be filtered in the exporter and importer
+
 1.0.22
 Importer now revalidates the connected handlers when its neighbor changes this fixes issues with exporters exporting to importers that don't have a valid handler
 

@@ -22,6 +22,8 @@ import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
 import mekanism.api.Action;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
+import mekanism.client.recipe_viewer.jei.ChemicalStackHelper;
+import mekanism.common.capabilities.holder.chemical.ChemicalTankHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -52,6 +54,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoader;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -66,7 +69,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-
 public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IAttachmentHolder {
 
     private List<BlockPos> importerPositions;
@@ -75,6 +77,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
     private final Map<BlockPos, ImporterBlockEntity> importerCache = new HashMap<>();
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
+    private final NonNullList<?> chemicalFilters;
     private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -120,6 +123,12 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         super(RoutersBlockEntities.EXPORTER_BLOCK_ENTITY.get(), pos, state);
         this.importerPositions = new ArrayList<>();
 
+        if (ModList.get().isLoaded("mekanism")) {
+            chemicalFilters = MekanismCompat.createChemicalFilters();
+        } else {
+            chemicalFilters = NonNullList.withSize(18, ItemStack.EMPTY);
+        }
+
         this.data = new ContainerData() {;
             @Override
             public int get(int index) {
@@ -152,6 +161,10 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
     public NonNullList<FluidStack> getFluidFilters() {
         return fluidFilters;
+    }
+
+    public NonNullList<?> getChemicalFilters() {
+        return chemicalFilters;
     }
 
     public ItemStackHandler getItemStackHandler() {
@@ -243,7 +256,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             }
         }
 
-        // --- Items / Fluids / Chemicals on operation tick ---
         if (level.getGameTime() % speedPerOperation == 0 && targetBlockEntity != null) {
             IItemHandler targetItemHandler = Capabilities.ItemHandler.BLOCK.getCapability(
                     level, targetPos, level.getBlockState(targetPos), targetBlockEntity, inputDirection);
@@ -432,63 +444,267 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             }
 
             // --- Chemicals ---
+// --- Chemicals ---
             if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
+                // safe cast; list exists even when Mekanism isn't present
+                @SuppressWarnings("unchecked")
+                NonNullList<Object> exporterFilters = (NonNullList<Object>) getChemicalFilters();
                 int maxTransfer = getExtractAmount(RoutersTags.Items.CHEMICAL_UPGRADES);
 
+                // helper lambdas (local methods would be nicer, but keep inline for single paste)
+                final var isEmptyFilter = new java.util.function.Predicate<Object>() {
+                    @Override
+                    public boolean test(Object f) {
+                        if (f == null) return true;
+                        // treat the compat empty placeholder as empty if present
+                        if (f == MekanismCompat.EMPTY_CHEMICAL) return true;
+                        // try reflective isEmpty() if method exists
+                        try {
+                            java.lang.reflect.Method m = f.getClass().getMethod("isEmpty");
+                            Object r = m.invoke(f);
+                            if (r instanceof Boolean) return (Boolean) r;
+                        } catch (NoSuchMethodException ignored) {
+                        } catch (Exception e) {
+                            // fallthrough to non-empty
+                        }
+                        return false;
+                    }
+                };
+
+                final var matchesFilter = new java.util.function.BiPredicate<Object, Object>() {
+                    @Override
+                    public boolean test(Object filter, Object chemStack) {
+                        // if filter is null/empty => allow (same semantics as fluid/item code)
+                        if (filter == null) return true;
+                        if (filter == MekanismCompat.EMPTY_CHEMICAL) return true;
+                        // chemStack is a ChemicalStack from Mekanism; if it's null, reject
+                        if (chemStack == null) return false;
+
+                        // Try direct equals in both directions (covers many compat wrappers)
+                        try {
+                            if (filter.equals(chemStack)) return true;
+                        } catch (Throwable ignored) {}
+                        try {
+                            if (chemStack.equals(filter)) return true;
+                        } catch (Throwable ignored) {}
+
+                        // Fallback: try to call isEmpty() on filter (if not empty we've already failed),
+                        // or compare types/names with reflection (best-effort).
+                        try {
+                            // get something meaningful like "getChemical" / "getType" / "getDefinition" if available
+                            java.lang.reflect.Method getTypeMethod = null;
+                            for (String name : new String[]{"getType", "getChemical", "getDefinition", "getLeft"}) {
+                                try {
+                                    getTypeMethod = filter.getClass().getMethod(name);
+                                    break;
+                                } catch (NoSuchMethodException ignored) {}
+                            }
+                            java.lang.reflect.Method chemGetTypeMethod = null;
+                            Class<?> chemClass = chemStack.getClass();
+                            for (String name : new String[]{"getType", "getChemical", "getDefinition", "getLeft"}) {
+                                try {
+                                    chemGetTypeMethod = chemClass.getMethod(name);
+                                    break;
+                                } catch (NoSuchMethodException ignored) {}
+                            }
+
+                            if (getTypeMethod != null && chemGetTypeMethod != null) {
+                                Object fType = getTypeMethod.invoke(filter);
+                                Object cType = chemGetTypeMethod.invoke(chemStack);
+                                if (fType != null && fType.equals(cType)) return true;
+                            }
+                        } catch (Throwable ignored) {}
+
+                        return false;
+                    }
+                };
+
+                // Helper that tests exporter filters the same way your fluids/items do:
+                final var exporterAllows = new java.util.function.Predicate<Object>() {
+                    @Override
+                    public boolean test(Object chemStack) {
+                        // If all exporter filters are empty -> allow all
+                        boolean allEmpty = true;
+                        for (Object f : exporterFilters) {
+                            if (!isEmptyFilter.test(f)) { allEmpty = false; break; }
+                        }
+                        if (allEmpty) return true;
+
+                        // Otherwise, require any filter to match
+                        for (Object f : exporterFilters) {
+                            if (!isEmptyFilter.test(f) && matchesFilter.test(f, chemStack)) return true;
+                        }
+                        return false;
+                    }
+                };
+
+                // ---- round-robin mode ----
                 if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
                     if (!importerPositions.isEmpty()) {
+                        int attempts = 0;
                         int index = lastRoundRobinIndex % importerPositions.size();
-                        BlockPos importerPos = importerPositions.get(index);
-                        BlockEntity be = findImporter(importerPos);
-                        if (be instanceof ImporterBlockEntity importer) {
-                            IChemicalHandler importerChemical = importer.getChemicalHandler();
-                            if (importerChemical != null) {
-                                for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
-                                    ChemicalStack stackInTank = targetChemicalHandler.getChemicalInTank(tank);
-                                    if (stackInTank.isEmpty()) continue;
 
-                                    ChemicalStack toExtract = stackInTank.copy();
-                                    toExtract.setAmount(Math.min(stackInTank.getAmount(), maxTransfer));
+                        while (attempts < importerPositions.size()) {
+                            BlockPos importerPos = importerPositions.get(index);
+                            BlockEntity be = findImporter(importerPos);
 
-                                    ChemicalStack remainder = importerChemical.insertChemical(toExtract, Action.SIMULATE);
-                                    long insertedAmount = toExtract.getAmount() - remainder.getAmount();
-                                    if (insertedAmount > 0) {
-                                        ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
-                                        importerChemical.insertChemical(extracted, Action.EXECUTE);
-                                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
-                                        return;
+                            if (be instanceof ImporterBlockEntity importer) {
+                                IChemicalHandler importerChem = importer.getChemicalHandler();
+                                if (importerChem != null) {
+
+                                    @SuppressWarnings("unchecked")
+                                    NonNullList<Object> importerFilters = (NonNullList<Object>) importer.getChemicalFilters();
+
+                                    for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
+                                        Object tankStack = targetChemicalHandler.getChemicalInTank(tank);
+                                        if (tankStack == null) continue;
+                                        // Mek chemical stacks have isEmpty(); try to check that (defensive)
+                                        boolean isTankEmpty = false;
+                                        try {
+                                            java.lang.reflect.Method isEmptyM = tankStack.getClass().getMethod("isEmpty");
+                                            Object r = isEmptyM.invoke(tankStack);
+                                            if (r instanceof Boolean) isTankEmpty = (Boolean) r;
+                                        } catch (Throwable ignored) {}
+                                        if (isTankEmpty) continue;
+
+                                        // exporter-level allow / importer-level allow (same semantics as fluids)
+                                        if (!exporterAllows.test(tankStack)) continue;
+
+                                        // If all importer filters are empty => importer allows all
+                                        boolean importerAllEmpty = true;
+                                        for (Object f : importerFilters) {
+                                            if (!isEmptyFilter.test(f)) { importerAllEmpty = false; break; }
+                                        }
+                                        if (!importerAllEmpty) {
+                                            boolean anyMatch = false;
+                                            for (Object f : importerFilters) {
+                                                if (!isEmptyFilter.test(f) && matchesFilter.test(f, tankStack)) { anyMatch = true; break; }
+                                            }
+                                            if (!anyMatch) continue; // importer rejects this chemical
+                                        }
+
+                                        // simulate insertion
+                                        // make a copy with amount limited
+                                        Object toExtract;
+                                        try {
+                                            java.lang.reflect.Method copyM = tankStack.getClass().getMethod("copy");
+                                            toExtract = copyM.invoke(tankStack);
+                                            // setAmount
+                                            try {
+                                                java.lang.reflect.Method setAmount = toExtract.getClass().getMethod("setAmount", long.class);
+                                                long amount = Math.min((long) toExtract.getClass().getMethod("getAmount").invoke(tankStack), (long) maxTransfer);
+                                                setAmount.invoke(toExtract, amount);
+                                            } catch (NoSuchMethodException ignored) {}
+                                        } catch (Throwable t) {
+                                            // if reflection fails, skip this tank
+                                            continue;
+                                        }
+
+                                        // simulate insert
+                                        try {
+                                            java.lang.reflect.Method insertSim = importerChem.getClass().getMethod("insertChemical", toExtract.getClass(), Action.class);
+                                            Object remainder = insertSim.invoke(importerChem, toExtract, Action.SIMULATE);
+                                            // remainder amount compare
+                                            long beforeAmount = (long) toExtract.getClass().getMethod("getAmount").invoke(toExtract);
+                                            long remainderAmount = (long) remainder.getClass().getMethod("getAmount").invoke(remainder);
+                                            long inserted = beforeAmount - remainderAmount;
+                                            if (inserted > 0) {
+                                                // actually extract then insert
+                                                java.lang.reflect.Method extractExec = targetChemicalHandler.getClass().getMethod("extractChemical", long.class, Action.class);
+                                                Object extracted = extractExec.invoke(targetChemicalHandler, inserted, Action.EXECUTE);
+                                                java.lang.reflect.Method insertExec = importerChem.getClass().getMethod("insertChemical", extracted.getClass(), Action.class);
+                                                insertExec.invoke(importerChem, extracted, Action.EXECUTE);
+
+                                                lastRoundRobinIndex = (index + 1) % importerPositions.size();
+                                                return; // done
+                                            }
+                                        } catch (Throwable e) {
+                                            // simulation failed; skip tank
+                                            continue;
+                                        }
                                     }
                                 }
                             }
+
+                            index = (index + 1) % importerPositions.size();
+                            attempts++;
                         }
-                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+                        lastRoundRobinIndex = index;
                     }
-                } else {
+                }
+
+                // ---- normal (non round-robin) mode ----
+                else {
                     for (BlockPos importerPos : importerPositions) {
                         ImporterBlockEntity importer = findImporter(importerPos);
                         if (importer == null) continue;
 
-                        IChemicalHandler importerChemical = importer.getChemicalHandler();
-                        if (importerChemical == null) continue;
+                        IChemicalHandler importerChem = importer.getChemicalHandler();
+                        if (importerChem == null) continue;
+
+                        @SuppressWarnings("unchecked")
+                        NonNullList<Object> importerFilters = (NonNullList<Object>) importer.getChemicalFilters();
 
                         for (int tank = 0; tank < targetChemicalHandler.getChemicalTanks(); tank++) {
-                            ChemicalStack stackInTank = targetChemicalHandler.getChemicalInTank(tank);
-                            if (stackInTank.isEmpty()) continue;
+                            Object tankStack = targetChemicalHandler.getChemicalInTank(tank);
+                            if (tankStack == null) continue;
+                            boolean isTankEmpty = false;
+                            try {
+                                java.lang.reflect.Method isEmptyM = tankStack.getClass().getMethod("isEmpty");
+                                Object r = isEmptyM.invoke(tankStack);
+                                if (r instanceof Boolean) isTankEmpty = (Boolean) r;
+                            } catch (Throwable ignored) {}
+                            if (isTankEmpty) continue;
 
-                            ChemicalStack toExtract = stackInTank.copy();
-                            toExtract.setAmount(Math.min(stackInTank.getAmount(), maxTransfer));
+                            if (!exporterAllows.test(tankStack)) continue;
 
-                            ChemicalStack remainder = importerChemical.insertChemical(toExtract, Action.SIMULATE);
-                            long insertedAmount = toExtract.getAmount() - remainder.getAmount();
-                            if (insertedAmount > 0) {
-                                ChemicalStack extracted = targetChemicalHandler.extractChemical(insertedAmount, Action.EXECUTE);
-                                importerChemical.insertChemical(extracted, Action.EXECUTE);
-                                return;
+                            boolean importerAllEmpty = true;
+                            for (Object f : importerFilters) {
+                                if (!isEmptyFilter.test(f)) { importerAllEmpty = false; break; }
+                            }
+                            if (!importerAllEmpty) {
+                                boolean anyMatch = false;
+                                for (Object f : importerFilters) {
+                                    if (!isEmptyFilter.test(f) && matchesFilter.test(f, tankStack)) { anyMatch = true; break; }
+                                }
+                                if (!anyMatch) continue;
+                            }
+
+                            // simulate insertion same as above
+                            Object toExtract;
+                            try {
+                                java.lang.reflect.Method copyM = tankStack.getClass().getMethod("copy");
+                                toExtract = copyM.invoke(tankStack);
+                                try {
+                                    java.lang.reflect.Method setAmount = toExtract.getClass().getMethod("setAmount", long.class);
+                                    long amount = Math.min((long) toExtract.getClass().getMethod("getAmount").invoke(tankStack), (long) maxTransfer);
+                                    setAmount.invoke(toExtract, amount);
+                                } catch (NoSuchMethodException ignored) {}
+                            } catch (Throwable t) {
+                                continue;
+                            }
+
+                            try {
+                                java.lang.reflect.Method insertSim = importerChem.getClass().getMethod("insertChemical", toExtract.getClass(), Action.class);
+                                Object remainder = insertSim.invoke(importerChem, toExtract, Action.SIMULATE);
+                                long beforeAmount = (long) toExtract.getClass().getMethod("getAmount").invoke(toExtract);
+                                long remainderAmount = (long) remainder.getClass().getMethod("getAmount").invoke(remainder);
+                                long inserted = beforeAmount - remainderAmount;
+                                if (inserted > 0) {
+                                    java.lang.reflect.Method extractExec = targetChemicalHandler.getClass().getMethod("extractChemical", long.class, Action.class);
+                                    Object extracted = extractExec.invoke(targetChemicalHandler, inserted, Action.EXECUTE);
+                                    java.lang.reflect.Method insertExec = importerChem.getClass().getMethod("insertChemical", extracted.getClass(), Action.class);
+                                    insertExec.invoke(importerChem, extracted, Action.EXECUTE);
+                                    return;
+                                }
+                            } catch (Throwable e) {
+                                continue;
                             }
                         }
                     }
                 }
             }
+
             // --- Ars Nouveau Source ---
             if (targetSourceHandler != null && hasUpgrade(RoutersTags.Items.SOURCE_UPGRADES)) {
                 int maxTransfer = getExtractAmount(RoutersTags.Items.SOURCE_UPGRADES);
@@ -683,6 +899,18 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         }
     }
 
+    private boolean matchesChemicalFilter(Object filter, ChemicalStack chemical) {
+        if (filter == null || chemical == null) return false;
+        if (!ModList.get().isLoaded("mekanism")) return false;
+
+        // Safe cast
+        @SuppressWarnings("unchecked")
+        NonNullList<Object> chemicalFilters = (NonNullList<Object>) this.getChemicalFilters();
+
+        // Compare filter to chemical
+        return filter.equals(chemical); // Or use Mekanism utility to compare stacks
+    }
+
     @Nullable
     private ImporterBlockEntity findImporter(BlockPos pos) {
         // Check cache first
@@ -831,6 +1059,10 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         ContainerHelper.saveAllItems(compoundTag, this.filters, provider);
         FluidContainerHelper.saveAllFluids(compoundTag, this.fluidFilters, true, provider);
 
+        if (ModList.get().isLoaded("mekanism")) {
+            MekanismCompat.saveChemicalFilters(compoundTag, (NonNullList<ChemicalStack>) chemicalFilters, provider);
+        }
+
         if (importerPositions != null && !importerPositions.isEmpty()) {
             ListTag listTag = new ListTag();
             for (BlockPos pos : importerPositions) {
@@ -854,6 +1086,10 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
 
         ContainerHelper.loadAllItems(compoundTag, this.filters, provider);
         FluidContainerHelper.loadAllFluids(compoundTag, fluidFilters, provider);
+
+        if (ModList.get().isLoaded("mekanism")) {
+            MekanismCompat.loadChemicalFilters(compoundTag, (NonNullList<ChemicalStack>) chemicalFilters, provider);
+        }
 
         importerPositions = new ArrayList<>();
         if (compoundTag.contains("ImporterPositions")) {

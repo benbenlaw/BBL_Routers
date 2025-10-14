@@ -4,9 +4,11 @@ import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
+import com.benbenlaw.routers.networking.packets.SyncChemicalListToClient;
 import com.benbenlaw.routers.networking.packets.SyncFluidListToClient;
 import com.benbenlaw.routers.screen.ExporterMenu;
 import com.mojang.serialization.MapCodec;
+import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -41,6 +43,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -185,6 +188,9 @@ public class ExporterBlock extends BaseEntityBlock implements SimpleWaterloggedB
             // Optional: sync fluid filters to client
             if (player instanceof ServerPlayer serverPlayer) {
                 PacketDistributor.sendToPlayer(serverPlayer, new SyncFluidListToClient(blockPos, exporter.getFluidFilters()));
+                if (ModList.get().isLoaded("mekanism")) {
+                    PacketDistributor.sendToPlayer(serverPlayer, new SyncChemicalListToClient(blockPos, (List<ChemicalStack>) exporter.getChemicalFilters()));
+                }
             }
         }
 

@@ -6,6 +6,7 @@ import com.benbenlaw.routers.util.RoutersTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,10 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
                 .addTag(RoutersTags.Items.HEAT_UPGRADES_PC)
                 .addTag(RoutersTags.Items.DIMENSIONAL_UPGRADES)
         ;
+
+        //Wrenches
+        this.tag(Tags.Items.TOOLS_WRENCH)
+                .add(RoutersItems.ROUTER_CONNECTOR.asItem());
 
         //Dimensional Upgrades
         this.tag(RoutersTags.Items.DIMENSIONAL_UPGRADES).add(

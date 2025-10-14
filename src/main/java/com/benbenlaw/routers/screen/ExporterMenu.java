@@ -3,9 +3,12 @@ package com.benbenlaw.routers.screen;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
+import com.benbenlaw.routers.block.entity.MekanismCompat;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import com.mojang.datafixers.util.Pair;
+import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
@@ -14,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -21,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class ExporterMenu extends AbstractContainerMenu {
 
@@ -59,7 +64,6 @@ public class ExporterMenu extends AbstractContainerMenu {
         for (int row = 0; row < 2; row++) {
             for (int col = 0; col < 9; col++) {
                 GhostSlot slot = getGhostSlot(col, row);
-
                 this.addSlot(slot);
             }
         }
@@ -112,6 +116,17 @@ public class ExporterMenu extends AbstractContainerMenu {
         }
     }
 
+    public void updateChemicals(List<?> chemicals) {
+        if (!ModList.get().isLoaded("mekanism")) return;
+        for (int i = 0; i < slots.size(); i++) {
+            if (slots.get(i) instanceof GhostSlot ghostSlot) {
+                Object chemical = i < chemicals.size() ? chemicals.get(i) : MekanismCompat.EMPTY_CHEMICAL;
+                ghostSlot.setChemical(chemical);
+            }
+        }
+    }
+
+
     @Override
     public void removed(Player player) {
         super.removed(player);
@@ -132,26 +147,54 @@ public class ExporterMenu extends AbstractContainerMenu {
             ItemStack carried = player.containerMenu.getCarried();
             var fluid = FluidUtil.getFluidContained(carried);
 
+            // Handle fluids
             if (fluid.isPresent()) {
                 blockEntity.getFilters().set(slotId, ItemStack.EMPTY);
                 blockEntity.getFluidFilters().set(slotId, fluid.get());
                 ghostSlot.set(ItemStack.EMPTY);
                 ghostSlot.setFluid(fluid.get());
-            } else if (!carried.isEmpty()) {
+                if (ModList.get().isLoaded("mekanism")) {
+                    @SuppressWarnings("unchecked")
+                    NonNullList<Object> chemicals = (NonNullList<Object>) blockEntity.getChemicalFilters();
+                    Object emptyChemical = MekanismCompat.EMPTY_CHEMICAL != null ? MekanismCompat.EMPTY_CHEMICAL : MekanismCompat.createChemicalStack();
+                    chemicals.set(slotId, emptyChemical);
+                    ghostSlot.setChemical(emptyChemical);
+                }
+            }
+            // Handle items
+            else if (!carried.isEmpty()) {
                 blockEntity.getFilters().set(slotId, carried.copyWithCount(1));
                 blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
                 ghostSlot.set(carried.copyWithCount(1));
                 ghostSlot.setFluid(FluidStack.EMPTY);
-            } else {
+                if (ModList.get().isLoaded("mekanism")) {
+                    @SuppressWarnings("unchecked")
+                    NonNullList<Object> chemicals = (NonNullList<Object>) blockEntity.getChemicalFilters();
+                    Object emptyChemical = MekanismCompat.EMPTY_CHEMICAL != null ? MekanismCompat.EMPTY_CHEMICAL : MekanismCompat.createChemicalStack();
+                    chemicals.set(slotId, emptyChemical);
+                    ghostSlot.setChemical(emptyChemical);
+                }
+            }
+            // Handle clearing
+            else {
                 blockEntity.getFilters().set(slotId, ItemStack.EMPTY);
                 blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
                 ghostSlot.set(ItemStack.EMPTY);
                 ghostSlot.setFluid(FluidStack.EMPTY);
+                if (ModList.get().isLoaded("mekanism")) {
+                    @SuppressWarnings("unchecked")
+                    NonNullList<Object> chemicals = (NonNullList<Object>) blockEntity.getChemicalFilters();
+                    Object emptyChemical = MekanismCompat.EMPTY_CHEMICAL != null ? MekanismCompat.EMPTY_CHEMICAL : MekanismCompat.createChemicalStack();
+                    chemicals.set(slotId, emptyChemical);
+                    ghostSlot.setChemical(emptyChemical);
+                }
             }
+
             blockEntity.setChanged();
         }
         super.clicked(slotId, dragType, clickType, player);
     }
+
 
     private static final int HOTBAR_SLOT_COUNT = 9;
     private static final int PLAYER_INVENTORY_ROW_COUNT = 3;

@@ -12,6 +12,7 @@ import com.hollingsworth.arsnouveau.api.source.ISourceCap;
 import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 import me.desht.pneumaticcraft.api.heat.IHeatExchangerLogic;
 import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
+import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -59,6 +60,7 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
     private String dimension = "";
     private final NonNullList<ItemStack> filters = NonNullList.withSize(18, ItemStack.EMPTY);
     private final NonNullList<FluidStack> fluidFilters = NonNullList.withSize(18, FluidStack.EMPTY);
+    private final NonNullList<?> chemicalFilters;
 
     @Override
     public @NotNull Component getDisplayName() {
@@ -72,6 +74,13 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
 
     public ImporterBlockEntity(BlockPos pos, BlockState state) {
         super(RoutersBlockEntities.IMPORTER_BLOCK_ENTITY.get(), pos, state);
+
+        if (ModList.get().isLoaded("mekanism")) {
+            chemicalFilters = MekanismCompat.createChemicalFilters();
+        } else {
+            chemicalFilters = NonNullList.withSize(18, ItemStack.EMPTY);
+        }
+
         this.data = new ContainerData() {
             private final int[] values = new int[2];
 
@@ -107,6 +116,10 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
 
     public NonNullList<FluidStack> getFluidFilters() {
         return fluidFilters;
+    }
+
+    public NonNullList<?> getChemicalFilters() {
+        return chemicalFilters;
     }
 
     public void tick() {
@@ -273,6 +286,10 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
         ContainerHelper.saveAllItems(compoundTag, this.filters, provider);
         FluidContainerHelper.saveAllFluids(compoundTag, this.fluidFilters, true, provider);
 
+        if (ModList.get().isLoaded("mekanism")) {
+            MekanismCompat.saveChemicalFilters(compoundTag, (NonNullList<ChemicalStack>) chemicalFilters, provider);
+        }
+
         if (extractorPos != null) {
             compoundTag.putInt("extractorX", extractorPos.getX());
             compoundTag.putInt("extractorY", extractorPos.getY());
@@ -289,6 +306,10 @@ public class ImporterBlockEntity extends BlockEntity implements MenuProvider {
 
         ContainerHelper.loadAllItems(compoundTag, this.filters, provider);
         FluidContainerHelper.loadAllFluids(compoundTag, this.fluidFilters, provider);
+
+        if (ModList.get().isLoaded("mekanism")) {
+            MekanismCompat.loadChemicalFilters(compoundTag, (NonNullList<ChemicalStack>) chemicalFilters, provider);
+        }
 
         if (compoundTag.contains("extractorX") && compoundTag.contains("extractorY") && compoundTag.contains("extractorZ")) {
             extractorPos = new BlockPos(compoundTag.getInt("extractorX"), compoundTag.getInt("extractorY"), compoundTag.getInt("extractorZ"));

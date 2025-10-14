@@ -3,8 +3,10 @@ package com.benbenlaw.routers.screen;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
 import com.benbenlaw.routers.block.entity.ImporterBlockEntity;
+import com.benbenlaw.routers.block.entity.MekanismCompat;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +63,6 @@ public class ImporterMenu extends AbstractContainerMenu {
         for (int row = 0; row < 2; row++) {
             for (int col = 0; col < 9; col++) {
                 GhostSlot slot = getGhostSlot(col, row);
-
                 this.addSlot(slot);
             }
         }
@@ -99,6 +101,16 @@ public class ImporterMenu extends AbstractContainerMenu {
         }
     }
 
+    public void updateChemicals(List<?> chemicals) {
+        if (!ModList.get().isLoaded("mekanism")) return;
+        for (int i = 0; i < slots.size(); i++) {
+            if (slots.get(i) instanceof GhostSlot ghostSlot) {
+                Object chemical = i < chemicals.size() ? chemicals.get(i) : MekanismCompat.EMPTY_CHEMICAL;
+                ghostSlot.setChemical(chemical);
+            }
+        }
+    }
+
     @Override
     public void removed(Player player) {
         super.removed(player);
@@ -124,16 +136,37 @@ public class ImporterMenu extends AbstractContainerMenu {
                 blockEntity.getFluidFilters().set(slotId, fluid.get());
                 ghostSlot.set(ItemStack.EMPTY);
                 ghostSlot.setFluid(fluid.get());
+                if (ModList.get().isLoaded("mekanism")) {
+                    @SuppressWarnings("unchecked")
+                    NonNullList<Object> chemicals = (NonNullList<Object>) blockEntity.getChemicalFilters();
+                    Object emptyChemical = MekanismCompat.EMPTY_CHEMICAL != null ? MekanismCompat.EMPTY_CHEMICAL : MekanismCompat.createChemicalStack();
+                    chemicals.set(slotId, emptyChemical);
+                    ghostSlot.setChemical(emptyChemical);
+                }
             } else if (!carried.isEmpty()) {
                 blockEntity.getFilters().set(slotId, carried.copyWithCount(1));
                 blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
                 ghostSlot.set(carried.copyWithCount(1));
                 ghostSlot.setFluid(FluidStack.EMPTY);
+                if (ModList.get().isLoaded("mekanism")) {
+                    @SuppressWarnings("unchecked")
+                    NonNullList<Object> chemicals = (NonNullList<Object>) blockEntity.getChemicalFilters();
+                    Object emptyChemical = MekanismCompat.EMPTY_CHEMICAL != null ? MekanismCompat.EMPTY_CHEMICAL : MekanismCompat.createChemicalStack();
+                    chemicals.set(slotId, emptyChemical);
+                    ghostSlot.setChemical(emptyChemical);
+                }
             } else {
                 blockEntity.getFilters().set(slotId, ItemStack.EMPTY);
                 blockEntity.getFluidFilters().set(slotId, FluidStack.EMPTY);
                 ghostSlot.set(ItemStack.EMPTY);
                 ghostSlot.setFluid(FluidStack.EMPTY);
+                if (ModList.get().isLoaded("mekanism")) {
+                    @SuppressWarnings("unchecked")
+                    NonNullList<Object> chemicals = (NonNullList<Object>) blockEntity.getChemicalFilters();
+                    Object emptyChemical = MekanismCompat.EMPTY_CHEMICAL != null ? MekanismCompat.EMPTY_CHEMICAL : MekanismCompat.createChemicalStack();
+                    chemicals.set(slotId, emptyChemical);
+                    ghostSlot.setChemical(emptyChemical);
+                }
             }
             blockEntity.setChanged();
         }

@@ -1,14 +1,17 @@
 package com.benbenlaw.routers.integration;
 
 import com.benbenlaw.routers.networking.packets.JEISyncToMenu;
+import com.benbenlaw.routers.networking.packets.JEISyncToMenuChemical;
 import com.benbenlaw.routers.networking.packets.JEISyncToMenuFluid;
 import com.benbenlaw.routers.screen.ExporterScreen;
 import com.benbenlaw.routers.screen.ImporterScreen;
 import com.benbenlaw.routers.screen.util.GhostSlot;
+import mekanism.api.chemical.ChemicalStack;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -47,6 +50,13 @@ public class GhostIngredientImporterHandler implements IGhostIngredientHandler<I
                         if (ingredientObj instanceof FluidStack stack) {
                             PacketDistributor.sendToServer(new JEISyncToMenuFluid(finalI, stack));
                             ghostSlot.setFluid(stack);
+                        }
+
+                        if (ModList.get().isLoaded("mekanism")) {
+                            if (ingredientObj instanceof ChemicalStack stack) {
+                                PacketDistributor.sendToServer(new JEISyncToMenuChemical(finalI, stack));
+                                ghostSlot.setChemical(stack);
+                            }
                         }
                     }
                 });

@@ -1,9 +1,11 @@
 package com.benbenlaw.routers.integration;
 
 import com.benbenlaw.routers.networking.packets.JEISyncToMenu;
+import com.benbenlaw.routers.networking.packets.JEISyncToMenuChemical;
 import com.benbenlaw.routers.networking.packets.JEISyncToMenuFluid;
 import com.benbenlaw.routers.screen.ExporterScreen;
 import com.benbenlaw.routers.screen.util.GhostSlot;
+import mekanism.api.chemical.ChemicalStack;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import net.minecraft.client.renderer.Rect2i;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -38,7 +41,7 @@ public class GhostIngredientExporterHandler implements IGhostIngredientHandler<E
 
                     @Override
                     public void accept(I ingredientObj) {
-                        // only handle items for now
+
                         if (ingredientObj instanceof ItemStack stack) {
                             PacketDistributor.sendToServer(new JEISyncToMenu(finalI, stack));
                             ghostSlot.set(stack.copyWithCount(1));
@@ -48,9 +51,18 @@ public class GhostIngredientExporterHandler implements IGhostIngredientHandler<E
                             PacketDistributor.sendToServer(new JEISyncToMenuFluid(finalI, stack));
                             ghostSlot.setFluid(stack);
                         }
+
+                        if (ModList.get().isLoaded("mekanism")) {
+                            if (ingredientObj instanceof ChemicalStack stack) {
+                                PacketDistributor.sendToServer(new JEISyncToMenuChemical(finalI, stack));
+                                ghostSlot.setChemical(stack);
+                            }
+                        }
                     }
                 });
             }
+
+
         }
 
         return targets;

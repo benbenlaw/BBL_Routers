@@ -4,6 +4,7 @@ import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,6 +19,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -46,13 +48,28 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
 
         for (Slot slot : this.menu.slots) {
-            if (slot instanceof GhostSlot ghostSlot && ghostSlot.hasFluid()) {
-                FluidStack fluid = ghostSlot.getGhostFluid();
+            if (slot instanceof GhostSlot ghostSlot) {
+                if (ghostSlot.hasFluid()) {
+                    FluidStack fluid = ghostSlot.getGhostFluid();
 
-                if (!fluid.isEmpty()) {
-                    renderFluidStack(guiGraphics, fluid, x + slot.x, y + slot.y, 16, 16);
-                }else {
-                    guiGraphics.renderTooltip(font, Component.literal("empty"), mouseX, mouseY);
+                    if (!fluid.isEmpty()) {
+                        renderFluidStack(guiGraphics, fluid, x + slot.x, y + slot.y, 16, 16);
+                    } else {
+                        guiGraphics.renderTooltip(font, Component.literal("empty"), mouseX, mouseY);
+                    }
+                }
+                if (ModList.get().isLoaded("mekanism") && ghostSlot.hasChemical()) {
+                    Object chemicalObj = ghostSlot.getGhostChemical();
+
+                    if (chemicalObj != null) {
+                        ChemicalStack stack = (ChemicalStack) chemicalObj;
+
+                        if (!stack.isEmpty()) {
+                            renderChemicalStack(guiGraphics, stack, x + slot.x, y + slot.y, 16, 16);
+                        } else {
+                            guiGraphics.renderTooltip(font, Component.literal("empty"), mouseX, mouseY);
+                        }
+                    }
                 }
             }
         }
@@ -86,6 +103,28 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
+    public void renderChemicalStack(GuiGraphics guiGraphics, ChemicalStack stack, int x, int y, int width, int height) {
+        if (stack.isEmpty()) return;
+
+        var chemical = stack.getChemical();
+        var sprite = chemical.getIcon();
+        var atlas = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS);
+        var spriteObj = atlas.apply(sprite);
+
+        RenderSystem.setShaderTexture(0, spriteObj.atlasLocation());
+
+        int color = stack.getChemicalTint();
+        float r = (color >> 16 & 0xFF) / 255.0F;
+        float g = (color >> 8 & 0xFF) / 255.0F;
+        float b = (color & 0xFF) / 255.0F;
+        RenderSystem.setShaderColor(r, g, b, 1.0F);
+
+        guiGraphics.blit(x, y, 0, width, height, spriteObj);
+
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f); // reset
+    }
+
+
     @Override
     public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderTooltip(guiGraphics, mouseX, mouseY);
@@ -103,13 +142,21 @@ public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
                         Component fluidName = ghostSlot.getGhostFluid().getHoverName();
                         guiGraphics.renderTooltip(font, fluidName, mouseX, mouseY);
                     }
+                    else if (ghostSlot.hasChemical() && ModList.get().isLoaded("mekanism") && ghostSlot.getGhostChemical() != null) {
+                        Object chemicalObj = ghostSlot.getGhostChemical();
+                        if (chemicalObj == null) return;
+
+                        ChemicalStack chemicalStack = (ChemicalStack) chemicalObj;
+                        Component chemicalName = chemicalStack.getTextComponent();
+                        guiGraphics.renderTooltip(font, chemicalName, mouseX, mouseY);
+                    }
                     else {
                         Component emptyText = Component.translatable("tooltip.routers.exporter_filter_slots").withStyle(ChatFormatting.GRAY);
                         guiGraphics.renderTooltip(font, emptyText, mouseX, mouseY);
                     }
                 }
                 // Upgrade slot tooltips
-                else if (slot.getItem().isEmpty()) {
+                else if (slot.getItem().isEmpty() && slot.index >= 18 && slot.index <= 26) {
                     Component upgradeText = Component.translatable("tooltip.routers.exporter_upgrades_slots").withStyle(ChatFormatting.GRAY);
                     guiGraphics.renderTooltip(font, upgradeText, mouseX, mouseY);
                 }
