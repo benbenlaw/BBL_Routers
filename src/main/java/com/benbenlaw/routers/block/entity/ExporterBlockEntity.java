@@ -444,7 +444,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             }
 
             // --- Chemicals ---
-// --- Chemicals ---
             if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
                 // safe cast; list exists even when Mekanism isn't present
                 @SuppressWarnings("unchecked")
@@ -986,7 +985,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
         }
         return expanded;
     }
-
 
 
     public int getSpeedPerOperation() {
