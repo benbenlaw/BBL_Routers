@@ -49,6 +49,10 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
         simpleItem(RoutersItems.SOURCE_UPGRADE_3);
         simpleItem(RoutersItems.SOURCE_UPGRADE_4);
 
+        simpleItem(RoutersItems.PRESSURE_UPGRADE);
+        simpleItem(RoutersItems.REINFORCED_PRESSURE_UPGRADE);
+        simpleItem(RoutersItems.ADVANCED_PRESSURE_UPGRADE);
+
         simpleItem(RoutersItems.ROUND_ROBIN_UPGRADE);
         simpleItem(RoutersItems.MOD_FILTER);
         simpleItem(RoutersItems.TAG_FILTER);

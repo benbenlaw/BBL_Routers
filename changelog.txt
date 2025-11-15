@@ -1,6 +1,11 @@
 Routers
 
 
+1.1.1
+- Removed old line rendering
+- Added new BlocKEntityRenderer for exporter, each resource shows a differ color line
+- Added Pressure Upgrade recipes and lang
+
 1.1.0
 - Enabled PneumaticCraft, added 3 levels of pressure upgrades following the max pressure of the pipes from PneumaticCraft
 - More work on updated visuals

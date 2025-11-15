@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "routers:item/advanced_pressure_upgrade"
+  }
+}

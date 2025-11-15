@@ -1,4 +1,5 @@
-// 1.21.1	2025-09-15T16:04:42.5565584	routers Item Models
+// 1.21.1	2025-11-15T18:22:13.09777	routers Item Models
+a31b80393227d5d6f7f8b61d5ea6504656e0379a assets/routers/models/item/advanced_pressure_upgrade.json
 cdc169fc04bad0ed1b2baa163e5f5e710448386a assets/routers/models/item/chemical_upgrade_1.json
 afc620126a6c7afbe059c37f12b9059a71dd1015 assets/routers/models/item/chemical_upgrade_2.json
 daa142f7dba4a890b2a522b16a464943a0e5e318 assets/routers/models/item/chemical_upgrade_3.json
@@ -13,6 +14,8 @@ d4f9882149a9d3e0c3640305d0d5ca5f48116ef4 assets/routers/models/item/fluid_upgrad
 24ef08262baf36532c571e8431e8ab74aaff6728 assets/routers/models/item/item_upgrade_3.json
 6195318a644748d90270b80e49610f4bd1c53cc6 assets/routers/models/item/item_upgrade_4.json
 505b4b9f68ca011f7d15b53fe1341ef5a5526b44 assets/routers/models/item/mod_filter.json
+94ba01a999f0c24c52f1f8b73f7c014ed9b30258 assets/routers/models/item/pressure_upgrade.json
+d484187455c7f15e284395b6d0249c83cb081e13 assets/routers/models/item/reinforced_pressure_upgrade.json
 cc1e725d3e9e9929b220c242d7fc394a47bb1a48 assets/routers/models/item/rf_upgrade_1.json
 0778bb8ae365732e778d1a318c21534e746665cd assets/routers/models/item/rf_upgrade_2.json
 fd236305d78ab5274c66ce85a026964ac36b9d57 assets/routers/models/item/rf_upgrade_3.json

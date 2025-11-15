@@ -49,6 +49,7 @@ public class RoutersLangProvider extends LanguageProvider {
         addItemTranslation("source_upgrade_3", "Source Upgrade III");
         addItemTranslation("source_upgrade_4", "Source Upgrade IV");
 
+
         addItemTranslation("soul_upgrade", "Soul Upgrade");
 
         addItemTranslation("round_robin_upgrade", "Round Robin Upgrade");
@@ -57,7 +58,9 @@ public class RoutersLangProvider extends LanguageProvider {
         addItemTranslation("dimensional_upgrade", "Dimensional Upgrade");
 
         addItemTranslation("pressure_upgrade", "Basic Pressure Upgrade");
+        addItemTranslation("reinforced_pressure_upgrade", "Reinforced Pressure Upgrade");
         addItemTranslation("advanced_pressure_upgrade", "Advanced Pressure Upgrade");
+
         addItemTranslation("heat_upgrade_pc", "Heat Upgrade (PneumaticCraft)");
 
 
@@ -87,6 +90,7 @@ public class RoutersLangProvider extends LanguageProvider {
         addTooltipsTranslation("tag_filter", "Tag: %s");
         addTooltipsTranslation("mod_filter", "Mod: %s");
         addTooltipsTranslation("dimensional_upgrade", "Allows the Exporter to extract to Importers in other Dimensions");
+        addTooltipsTranslation("pressure_upgrade", "Allows Extraction of Pneumaticcraft Air from the Exporter at %s Air/Per Operation");
 
 
 

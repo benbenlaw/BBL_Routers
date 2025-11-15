@@ -1,6 +1,7 @@
 {
   "values": [
     "routers:pressure_upgrade",
+    "routers:reinforced_pressure_upgrade",
     "routers:advanced_pressure_upgrade"
   ]
 }
