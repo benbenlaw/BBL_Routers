@@ -32,6 +32,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -280,6 +281,7 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     ? PNCCapabilities.getAirHandler(targetBlockEntity, inputDirection)
                     : Optional.empty();
 
+
             Optional<IHeatExchangerLogic> targetHeatHandler = ModList.get().isLoaded("pneumaticcraft")
                     ? PNCCapabilities.getHeatLogic(targetBlockEntity, inputDirection)
                     : Optional.empty();
@@ -442,7 +444,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
-
             // --- Chemicals ---
             if (targetChemicalHandler != null && hasUpgrade(RoutersTags.Items.CHEMICAL_UPGRADES)) {
                 // safe cast; list exists even when Mekanism isn't present
@@ -703,7 +704,6 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                     }
                 }
             }
-
             // --- Ars Nouveau Source ---
             if (targetSourceHandler != null && hasUpgrade(RoutersTags.Items.SOURCE_UPGRADES)) {
                 int maxTransfer = getExtractAmount(RoutersTags.Items.SOURCE_UPGRADES);
@@ -799,28 +799,55 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                 }
             }
             // --- PneumaticCraft Air Transfer ---
+            // --- PneumaticCraft Air Transfer ---
+            // --- PneumaticCraft Air Transfer ---
+            // --- PneumaticCraft Air Transfer ---
             if (!importerPositions.isEmpty() && hasUpgrade(RoutersTags.Items.PRESSURE_UPGRADES) && targetAirHandler.isPresent()) {
+                IAirHandlerMachine source = targetAirHandler.get();
+                if (source == null) return; // safety check
+
+                float available = source.getAir(); // get actual pressure
+                if (available <= 0f) return; // nothing to transfer
+
                 int maxTransfer = getExtractAmount(RoutersTags.Items.PRESSURE_UPGRADES);
 
                 if (hasUpgrade(RoutersTags.Items.ROUND_ROBIN_UPGRADES)) {
                     if (!importerPositions.isEmpty()) {
+                        int attempts = 0;
                         int index = lastRoundRobinIndex % importerPositions.size();
-                        BlockPos importerPos = importerPositions.get(index);
-                        BlockEntity be = findImporter(importerPos);
-                        if (be instanceof ImporterBlockEntity importer) {
-                            IAirHandlerMachine importerSource = importer.getPressureHandler();
-                            if (importerSource != null) {
-                                if (maxTransfer > 0) {
-                                    targetAirHandler.get().addAir(-maxTransfer);
-                                    importerSource.addAir(maxTransfer);
-                                    lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
-                                    return;
+
+                        while (attempts < importerPositions.size()) {
+                            BlockPos importerPos = importerPositions.get(index);
+                            BlockEntity be = findImporter(importerPos);
+
+                            if (be instanceof ImporterBlockEntity importer) {
+                                IAirHandlerMachine importerSource = importer.getPressureHandler();
+                                if (importerSource != null) {
+                                    // Determine how much we can actually transfer
+                                    int transfer = (int)Math.min(maxTransfer, Math.floor(available));
+                                    if (transfer > 0) {
+                                        source.addAir(-transfer);       // remove from exporter
+                                        importerSource.addAir(transfer); // add to importer
+                                        importerSource.setConnectableFaces(
+                                                Collections.singleton(importer.getBlockState().getValue(ImporterBlock.FACING).getOpposite())
+                                        );
+
+                                        lastRoundRobinIndex = (index + 1) % importerPositions.size();
+                                        return; // stop after first successful transfer
+                                    }
                                 }
                             }
+
+                            // move to next importer
+                            index = (index + 1) % importerPositions.size();
+                            attempts++;
                         }
-                        lastRoundRobinIndex = (lastRoundRobinIndex + 1) % importerPositions.size();
+
+                        // if nothing transferred, still advance index
+                        lastRoundRobinIndex = index;
                     }
                 } else {
+                    // Normal (non round-robin) mode
                     for (BlockPos importerPos : importerPositions) {
                         ImporterBlockEntity importer = findImporter(importerPos);
                         if (importer == null) continue;
@@ -828,15 +855,21 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
                         IAirHandlerMachine importerSource = importer.getPressureHandler();
                         if (importerSource == null) continue;
 
-                        if (maxTransfer > 0) {
-                            targetAirHandler.get().addAir(-maxTransfer);
-                            importerSource.addAir(maxTransfer);
-                            importerSource.setConnectableFaces(Collections.singleton(importer.getBlockState().getValue(ImporterBlock.FACING).getOpposite()));
-                            break;
+                        int transfer = (int)Math.min(maxTransfer, Math.floor(available));
+                        if (transfer > 0) {
+                            source.addAir(-transfer);
+                            importerSource.addAir(transfer);
+                            importerSource.setConnectableFaces(
+                                    Collections.singleton(importer.getBlockState().getValue(ImporterBlock.FACING).getOpposite())
+                            );
+                            break; // stop after first successful transfer
                         }
                     }
                 }
             }
+
+
+
             // --- PneumaticCraft Heat Transfer ---
             if (!importerPositions.isEmpty() && hasUpgrade(RoutersTags.Items.HEAT_UPGRADES_PC) && targetHeatHandler.isPresent()) {
                 IHeatExchangerLogic sourceHeatHandler = targetHeatHandler.get();

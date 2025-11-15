@@ -2,6 +2,7 @@ package com.benbenlaw.routers;
 
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.block.entity.RoutersBlockEntities;
+import com.benbenlaw.routers.block.entity.client.ExporterBlockEntityRenderer;
 import com.benbenlaw.routers.particle.RoutersParticles;
 import com.benbenlaw.routers.config.StartupConfig;
 import com.benbenlaw.routers.item.RoutersCreativeTab;
@@ -20,6 +21,7 @@ import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -65,7 +67,9 @@ public class Routers {
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             // Moved to event bus
-            //event.registerBlockEntityRenderer(RoutersBlockEntities.EXPORTER_BLOCK_ENTITY.get(), ExporterBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(RoutersBlockEntities.EXPORTER_BLOCK_ENTITY.get(), ExporterBlockEntityRenderer::new);
         }
     }
+
+
 }

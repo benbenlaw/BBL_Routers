@@ -3,13 +3,19 @@ package com.benbenlaw.routers.block.entity;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.block.ImporterBlock;
 import com.benbenlaw.routers.block.RoutersBlocks;
+import me.desht.pneumaticcraft.api.PNCCapabilities;
+import me.desht.pneumaticcraft.api.tileentity.IAirHandlerMachine;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class RoutersBlockEntities {

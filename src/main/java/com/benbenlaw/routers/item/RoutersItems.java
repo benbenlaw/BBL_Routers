@@ -71,8 +71,12 @@ public class RoutersItems {
 
     public static final DeferredItem<Item> PRESSURE_UPGRADE = ITEMS.register("pressure_upgrade",
             () -> new UpgradeItem(new Item.Properties(), 5));
+    public static final DeferredItem<Item> REINFORCE_PRESSURE_UPGRADE = ITEMS.register("reinforce_pressure_upgrade",
+            () -> new UpgradeItem(new Item.Properties(), 10));
     public static final DeferredItem<Item> ADVANCED_PRESSURE_UPGRADE = ITEMS.register("advanced_pressure_upgrade",
             () -> new UpgradeItem(new Item.Properties(), 20));
+
+    //nyi
     public static final DeferredItem<Item> HEAT_UPGRADE_PC = ITEMS.register("heat_upgrade_pc",
             () -> new UpgradeItem(new Item.Properties(), 5));
 

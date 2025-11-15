@@ -54,6 +54,7 @@ public class RoutersItemTagsProvider extends ItemTagsProvider {
         //Pressure Upgrades
         this.tag(RoutersTags.Items.PRESSURE_UPGRADES).add(
                 RoutersItems.PRESSURE_UPGRADE.get(),
+                RoutersItems.REINFORCE_PRESSURE_UPGRADE.get(),
                 RoutersItems.ADVANCED_PRESSURE_UPGRADE.get()
         );
 
