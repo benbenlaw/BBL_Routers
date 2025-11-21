@@ -45,14 +45,16 @@ public class RoutersCreativeTab {
                 output.accept(RoutersItems.SPEED_UPGRADE_3);
                 output.accept(RoutersItems.SPEED_UPGRADE_4);
 
-                output.accept(RoutersItems.PRESSURE_UPGRADE);
-                output.accept(RoutersItems.REINFORCED_PRESSURE_UPGRADE);
-                output.accept(RoutersItems.ADVANCED_PRESSURE_UPGRADE);
-
                 output.accept(RoutersItems.ROUND_ROBIN_UPGRADE);
                 output.accept(RoutersItems.MOD_FILTER);
                 output.accept(RoutersItems.TAG_FILTER);
                 output.accept(RoutersItems.DIMENSIONAL_UPGRADE);
+
+                if (ModList.get().isLoaded("pneumaticcraft")) {
+                    output.accept(RoutersItems.PRESSURE_UPGRADE);
+                    output.accept(RoutersItems.REINFORCED_PRESSURE_UPGRADE);
+                    output.accept(RoutersItems.ADVANCED_PRESSURE_UPGRADE);
+                }
 
                 if (ModList.get().isLoaded("mekanism")){
                     output.accept(RoutersItems.CHEMICAL_UPGRADE_1);
