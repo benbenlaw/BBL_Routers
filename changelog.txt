@@ -1,5 +1,11 @@
 Routers
 
+1.1.3
+- Tweaked PneumaticCraft pressure upgrade textures to be one color
+- Changes beam colors to be slightly more accurate to the color of the upgrades
+- Beam color now uses hex color codes for easier customization in the future
+- Fixed exporters that are facing up not rendering beams in the correct locations
+
 1.1.2
 - Fixed PneumaticCraft pressure upgrades showing when no PneumaticCraft installed
 
