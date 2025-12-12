@@ -35,7 +35,8 @@ import java.util.*;
 
 public class ExporterBlockEntityRenderer implements BlockEntityRenderer<ExporterBlockEntity> {
 
-    public ExporterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {}
+    public ExporterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+    }
 
     @Override
     public boolean shouldRender(ExporterBlockEntity blockEntity, Vec3 cameraPos) {
@@ -193,8 +194,8 @@ public class ExporterBlockEntityRenderer implements BlockEntityRenderer<Exporter
             PoseStack.Pose pose = poseStack.last();
 
             addBeamVertex(consumer, pose, -beamRadius, 0f, -beamRadius, r, g, b, a, 0f, vOffset, light, overlay);
-            addBeamVertex(consumer, pose,  beamRadius, 0f, -beamRadius, r, g, b, a, 1f, vOffset, light, overlay);
-            addBeamVertex(consumer, pose,  beamRadius, (float) length, -beamRadius, r, g, b, a, 1f, vOffset + (float) length, light, overlay);
+            addBeamVertex(consumer, pose, beamRadius, 0f, -beamRadius, r, g, b, a, 1f, vOffset, light, overlay);
+            addBeamVertex(consumer, pose, beamRadius, (float) length, -beamRadius, r, g, b, a, 1f, vOffset + (float) length, light, overlay);
             addBeamVertex(consumer, pose, -beamRadius, (float) length, -beamRadius, r, g, b, a, 0f, vOffset + (float) length, light, overlay);
 
             poseStack.popPose();
@@ -218,32 +219,54 @@ public class ExporterBlockEntityRenderer implements BlockEntityRenderer<Exporter
 
     private Vec3 getBeamStart(BlockPos pos, Level level) {
         var state = level.getBlockState(pos);
+
         Direction facing;
-        if (state.hasProperty(ExporterBlock.FACING)) facing = state.getValue(ExporterBlock.FACING);
-        else if (state.hasProperty(ImporterBlock.FACING)) facing = state.getValue(ImporterBlock.FACING);
-        else facing = Direction.UP;
+        if (state.hasProperty(ExporterBlock.FACING))
+            facing = state.getValue(ExporterBlock.FACING);
+        else if (state.hasProperty(ImporterBlock.FACING))
+            facing = state.getValue(ImporterBlock.FACING);
+        else
+            facing = Direction.UP;
 
         VoxelShape shape = state.getShape(level, pos, CollisionContext.empty());
-        double x = 0.5, y = 0.5, z = 0.5; // default to center
-        final double EPS = 0.001; // small inset to avoid integer positions
+        AABB bounds = shape.isEmpty() ? new AABB(0,0,0,1,1,1) : shape.bounds();
 
-        if (shape.isEmpty()) {
-            return new Vec3(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-        }
+        // Center of block (used for X/Z or fallback)
+        double cx = (bounds.minX + bounds.maxX) * 0.5;
+        double cy = (bounds.minY + bounds.maxY) * 0.5;
+        double cz = (bounds.minZ + bounds.maxZ) * 0.5;
 
-        for (AABB box : shape.toAabbs()) {
-            switch (facing) {
-                case UP ->  { x = (box.minX + box.maxX) / 2.0; y = box.maxY - EPS; z = (box.minZ + box.maxZ) / 2.0; }
-                case DOWN ->{ x = (box.minX + box.maxX) / 2.0; y = box.minY + EPS; z = (box.minZ + box.maxZ) / 2.0; }
-                case NORTH ->{ x = (box.minX + box.maxX) / 2.0; y = (box.minY + box.maxY) / 2.0; z = box.minZ + EPS;   }
-                case SOUTH ->{ x = (box.minX + box.maxX) / 2.0; y = (box.minY + box.maxY) / 2.0; z = box.maxZ - EPS;   }
-                case WEST -> { x = box.minX + EPS; y = (box.minY + box.maxY) / 2.0; z = (box.minZ + box.maxZ) / 2.0; }
-                case EAST -> { x = box.maxX - EPS; y = (box.minY + box.maxY) / 2.0; z = (box.minZ + box.maxZ) / 2.0; }
+        final double EPS = 0.001;
+        final double INSET = 0.2;  // how far inward to move
+
+        switch (facing) {
+            case UP -> {
+                cy = bounds.maxY - INSET;
+            }
+            case DOWN -> {
+                cy = bounds.minY + INSET;
+            }
+            case NORTH -> {
+                cz = bounds.minZ + INSET;
+            }
+            case SOUTH -> {
+                cz = bounds.maxZ - INSET;
+            }
+            case WEST -> {
+                cx = bounds.minX + INSET;
+            }
+            case EAST -> {
+                cx = bounds.maxX - INSET;
             }
         }
 
-        return new Vec3(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+        return new Vec3(
+                pos.getX() + cx,
+                pos.getY() + cy,
+                pos.getZ() + cz
+        );
     }
+
 
 
     private float[] getBeamTint(ItemStack stack) {
@@ -262,7 +285,7 @@ public class ExporterBlockEntityRenderer implements BlockEntityRenderer<Exporter
 
     private float[] hex(String hex) {
         int color = Integer.parseInt(hex, 16);
-        return new float[] {
+        return new float[]{
                 ((color >> 16) & 0xFF) / 255f,
                 ((color >> 8) & 0xFF) / 255f,
                 (color & 0xFF) / 255f

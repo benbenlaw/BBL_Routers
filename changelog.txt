@@ -1,5 +1,8 @@
 Routers
 
+1.1.4
+- Tweaked beam rendering again to be more consistent in all directions
+
 1.1.3
 - Tweaked PneumaticCraft pressure upgrade textures to be one color
 - Changes beam colors to be slightly more accurate to the color of the upgrades
