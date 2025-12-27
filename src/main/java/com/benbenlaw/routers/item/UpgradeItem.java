@@ -7,7 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
@@ -31,6 +31,7 @@ public class UpgradeItem extends Item {
     public int getExtractAmount() {
         return extractValuePerOperation;
     }
+/*
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> components, TooltipFlag flag) {
@@ -91,4 +92,6 @@ public class UpgradeItem extends Item {
         }
         return InteractionResultHolder.success(player.getItemInHand(hand));
     }
+
+ */
 }

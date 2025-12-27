@@ -1,7 +1,7 @@
 package com.benbenlaw.routers.util;
 
 import com.benbenlaw.routers.Routers;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -28,11 +28,11 @@ public class RoutersTags {
 
 
         private static TagKey<Item> tag(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, name));
+            return ItemTags.create(Identifier.fromNamespaceAndPath(Routers.MOD_ID, name));
         }
 
         private static TagKey<Item> commonTags(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return ItemTags.create(Identifier.fromNamespaceAndPath("c", name));
         }
 
     }

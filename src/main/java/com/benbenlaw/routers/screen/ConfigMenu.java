@@ -1,27 +1,16 @@
 package com.benbenlaw.routers.screen;
 
-import com.benbenlaw.routers.Routers;
-import com.benbenlaw.routers.block.RoutersBlocks;
-import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
-import com.benbenlaw.routers.screen.util.GhostSlot;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Objects;
 
 public class ConfigMenu extends AbstractContainerMenu {
 

@@ -3,7 +3,6 @@ package com.benbenlaw.routers.integration;
 import com.benbenlaw.routers.networking.packets.JEISyncToMenu;
 import com.benbenlaw.routers.networking.packets.JEISyncToMenuChemical;
 import com.benbenlaw.routers.networking.packets.JEISyncToMenuFluid;
-import com.benbenlaw.routers.screen.ExporterScreen;
 import com.benbenlaw.routers.screen.ImporterScreen;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import mekanism.api.chemical.ChemicalStack;

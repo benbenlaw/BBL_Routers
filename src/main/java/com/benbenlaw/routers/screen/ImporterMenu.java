@@ -1,9 +1,6 @@
 package com.benbenlaw.routers.screen;
 
 import com.benbenlaw.routers.block.RoutersBlocks;
-import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
-import com.benbenlaw.routers.block.entity.ImporterBlockEntity;
-import com.benbenlaw.routers.block.entity.MekanismCompat;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;

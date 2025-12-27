@@ -2,12 +2,11 @@ package com.benbenlaw.routers.item;
 
 import com.benbenlaw.routers.networking.packets.FilterItemUpdate;
 import com.benbenlaw.routers.screen.ConfigMenu;
-import com.benbenlaw.routers.util.RoutersTags;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -53,7 +52,7 @@ public class FilterItem extends Item {
 
             if (stack.is(RoutersItems.TAG_FILTER)) {
                 if (stack.has(RoutersDataComponents.TAG_FILTER.get())) {
-                    ResourceLocation tag = stack.get(RoutersDataComponents.TAG_FILTER.get());
+                    Identifier tag = stack.get(RoutersDataComponents.TAG_FILTER.get());
                     assert tag != null;
                     components.add(Component.translatable("tooltip.routers.tag_filter", tag.toString()).withStyle(ChatFormatting.YELLOW));
                 } else {
@@ -75,7 +74,7 @@ public class FilterItem extends Item {
     }
 
 
-    public void setTag(ItemStack stack, ResourceLocation tag) {
+    public void setTag(ItemStack stack, Identifier tag) {
         stack.set(RoutersDataComponents.TAG_FILTER.get(), tag);
         PacketDistributor.sendToServer(new FilterItemUpdate(stack));
     }
@@ -87,7 +86,7 @@ public class FilterItem extends Item {
 
     public TagKey<Item> getTag(ItemStack stack) {
         if (stack.is(RoutersItems.TAG_FILTER) && stack.has(RoutersDataComponents.TAG_FILTER.get())) {
-            ResourceLocation tagLocation = stack.get(RoutersDataComponents.TAG_FILTER.get());
+            Identifier tagLocation = stack.get(RoutersDataComponents.TAG_FILTER.get());
             if (tagLocation != null) {
                 return TagKey.create(net.minecraft.core.registries.Registries.ITEM, tagLocation);
             }

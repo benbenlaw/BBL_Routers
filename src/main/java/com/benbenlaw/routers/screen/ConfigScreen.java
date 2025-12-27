@@ -4,44 +4,34 @@ import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.item.FilterItem;
 import com.benbenlaw.routers.item.RoutersDataComponents;
 import com.benbenlaw.routers.item.RoutersItems;
-import com.benbenlaw.routers.screen.util.GhostSlot;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.core.HolderSet;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
 
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, "textures/gui/config_gui.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Routers.MOD_ID, "textures/gui/config_gui.png");
 
     private EditBox searchBox;
     private final List<ItemStack> previewStacks = new ArrayList<>();
@@ -65,7 +55,7 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
         if (item.is(RoutersItems.MOD_FILTER)) {
             this.searchBox.setValue(item.getOrDefault(RoutersDataComponents.MOD_FILTER.get(), ""));
         } else if (item.is(RoutersItems.TAG_FILTER)) {
-            ResourceLocation tag = item.getOrDefault(RoutersDataComponents.TAG_FILTER.get(), ResourceLocation.parse("set:me"));
+            Identifier tag = item.getOrDefault(RoutersDataComponents.TAG_FILTER.get(), Identifier.parse("set:me"));
             this.searchBox.setValue(tag.toString());
         }
 
@@ -77,14 +67,10 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TEXTURE);
-
         int x = leftPos;
         int y = topPos;
 
-        guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 256, 256);
 
         // Render preview stack
         if (!previewStacks.isEmpty()) {
@@ -99,7 +85,6 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
         }
     }
 
-
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
@@ -107,29 +92,28 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
         renderTooltip(guiGraphics, mouseX, mouseY);
         this.searchBox.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
-    @Override
-    public boolean charTyped(char codePoint, int modifiers) {
-        return searchBox.charTyped(codePoint, modifiers) || super.charTyped(codePoint, modifiers);
+
+    public boolean charTyped(CharacterEvent event) {
+        return searchBox.charTyped(event) || super.charTyped(event);
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == Minecraft.getInstance().options.keyInventory.getKey().getValue()) {
+    public boolean keyPressed(KeyEvent event) {
+        if (event.input() == Minecraft.getInstance().options.keyInventory.getKey().getValue()) {
             return true;
         }
-        return searchBox.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        return searchBox.keyPressed(event) || super.keyPressed(event);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 1) {
-            if (searchBox.isMouseOver(mouseX, mouseY)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+        if (event.button() == 1) {
+            if (searchBox.isMouseOver(event.x(), event.y())) {
                 searchBox.setValue("");
                 searchBox.setCursorPosition(0);
                 return true;
             }
         }
-        return searchBox.mouseClicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+        return searchBox.mouseClicked(event, isDoubleClick) || super.mouseClicked(event, isDoubleClick);
     }
 
     private void onSearchChanged(String text) {
@@ -140,7 +124,7 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
             boolean valid = false;
 
             if (item.is(RoutersItems.TAG_FILTER)) {
-                ResourceLocation tagLocation = ResourceLocation.tryParse(value);
+                Identifier tagLocation = Identifier.tryParse(value);
                 if (tagLocation != null) {
                     TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tagLocation);
                     if (tagNotEmpty(tagKey)) {
@@ -159,20 +143,20 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
 
             if (!valid) {
                 if (item.is(RoutersItems.TAG_FILTER)) {
-                    filterItem.setTag(item, ResourceLocation.tryParse(""));
+                    filterItem.setTag(item, Identifier.tryParse(""));
                 } else if (item.is(RoutersItems.MOD_FILTER)) {
                     filterItem.setMod(item, "");
                 }
             } else {
                 updatePreviewStacks();
             }
+
         }
     }
 
 
-
     private boolean tagNotEmpty(TagKey<Item> tagKey) {
-        var optionalTag = BuiltInRegistries.ITEM.getTag(tagKey);
+        var optionalTag = BuiltInRegistries.ITEM.get(tagKey);
         return optionalTag.isPresent();
     }
 
@@ -190,15 +174,15 @@ public class ConfigScreen extends AbstractContainerScreen<ConfigMenu> {
 
         ItemStack item = menu.player.getItemBySlot(EquipmentSlot.MAINHAND);
         if (item.is(RoutersItems.TAG_FILTER)) {
-            ResourceLocation tagLoc = item.getOrDefault(RoutersDataComponents.TAG_FILTER.get(), Objects.requireNonNull(ResourceLocation.tryParse("minecraft:stone")));
+            Identifier tagLoc = item.getOrDefault(RoutersDataComponents.TAG_FILTER.get(), Objects.requireNonNull(Identifier.tryParse("minecraft:stone")));
             TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tagLoc);
-            BuiltInRegistries.ITEM.getTag(tagKey).ifPresent(tagSet ->
+            BuiltInRegistries.ITEM.get(tagKey).ifPresent(tagSet ->
                     tagSet.forEach(holder -> previewStacks.add(new ItemStack(holder.value())))
             );
         } else if (item.is(RoutersItems.MOD_FILTER)) {
             String modId = item.getOrDefault(RoutersDataComponents.MOD_FILTER.get(), "");
             BuiltInRegistries.ITEM.forEach(regItem -> {
-                ResourceLocation regName = BuiltInRegistries.ITEM.getKey(regItem);
+                Identifier regName = BuiltInRegistries.ITEM.getKey(regItem);
                 if (regName != null && regName.getNamespace().equals(modId)) {
                     previewStacks.add(new ItemStack(regItem));
                 }

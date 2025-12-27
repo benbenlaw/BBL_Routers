@@ -1,6 +1,5 @@
 package com.benbenlaw.routers.data;
 
-import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.HolderLookup;

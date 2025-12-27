@@ -3,7 +3,6 @@ package com.benbenlaw.routers.screen;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.screen.util.GhostSlot;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import mekanism.api.chemical.ChemicalStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -11,24 +10,19 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ExporterScreen extends AbstractContainerScreen<ExporterMenu> {
 
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, "textures/gui/exporter_gui.png");
+    private static final Identifier TEXTURE =
+            Identifier.fromNamespaceAndPath(Routers.MOD_ID, "textures/gui/exporter_gui.png");
 
     public ExporterScreen(ExporterMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);

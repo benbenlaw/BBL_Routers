@@ -11,20 +11,18 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 public class ImporterScreen extends AbstractContainerScreen<ImporterMenu> {
 
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, "textures/gui/importer_gui.png");
+    private static final Identifier TEXTURE =
+            Identifier.fromNamespaceAndPath(Routers.MOD_ID, "textures/gui/importer_gui.png");
 
     public ImporterScreen(ImporterMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);

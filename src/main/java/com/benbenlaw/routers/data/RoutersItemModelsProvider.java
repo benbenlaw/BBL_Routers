@@ -3,7 +3,7 @@ package com.benbenlaw.routers.data;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.item.RoutersItems;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -63,8 +63,8 @@ public class RoutersItemModelsProvider extends ItemModelProvider {
 
     private void simpleItem(DeferredItem<Item> item) {
         withExistingParent(item.getId().getPath(),
-                ResourceLocation.withDefaultNamespace("item/generated")).texture("layer0",
-                ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, "item/" + item.getId().getPath()));
+                Identifier.withDefaultNamespace("item/generated")).texture("layer0",
+                Identifier.fromNamespaceAndPath(Routers.MOD_ID, "item/" + item.getId().getPath()));
     }
 
     @Override

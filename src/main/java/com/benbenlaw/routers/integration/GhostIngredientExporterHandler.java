@@ -9,14 +9,13 @@ import mekanism.api.chemical.ChemicalStack;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import net.minecraft.client.renderer.Rect2i;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GhostIngredientExporterHandler implements IGhostIngredientHandler<ExporterScreen> {
 

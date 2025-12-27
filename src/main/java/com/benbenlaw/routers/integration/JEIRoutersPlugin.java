@@ -3,16 +3,14 @@ package com.benbenlaw.routers.integration;
 import com.benbenlaw.routers.Routers;
 import com.benbenlaw.routers.item.RoutersItems;
 import com.benbenlaw.routers.screen.ExporterScreen;
-import com.benbenlaw.routers.screen.ImporterMenu;
 import com.benbenlaw.routers.screen.ImporterScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IIngredientAliasRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 import java.util.List;
 
@@ -20,8 +18,8 @@ import java.util.List;
 public class JEIRoutersPlugin implements IModPlugin {
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(Routers.MOD_ID, "jei_plugin");
+    public Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath(Routers.MOD_ID, "jei_plugin");
     }
 
 

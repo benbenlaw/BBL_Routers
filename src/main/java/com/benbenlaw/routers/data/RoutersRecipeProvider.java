@@ -3,13 +3,7 @@ package com.benbenlaw.routers.data;
 import com.benbenlaw.routers.block.RoutersBlocks;
 import com.benbenlaw.routers.item.RoutersItems;
 import com.buuz135.industrialforegoingsouls.IndustrialForegoingSouls;
-import com.hollingsworth.arsnouveau.ArsNouveau;
-import com.hollingsworth.arsnouveau.common.items.ModItem;
-import com.hollingsworth.arsnouveau.common.lib.LibItemNames;
 import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
-import com.hollingsworth.arsnouveau.setup.registry.ItemsRegistry;
-import me.desht.pneumaticcraft.common.item.PneumaticCraftBucketItem;
-import me.desht.pneumaticcraft.common.util.PneumaticCraftUtils;
 import mekanism.common.registries.MekanismItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,12 +12,11 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Indentifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -414,10 +407,10 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
-                .define('A', BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:pressure_tube")))
-                .define('B', BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:ingot_iron_compressed")))
+                .define('A', BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:pressure_tube")))
+                .define('B', BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:ingot_iron_compressed")))
                 .group("strainers")
-                .unlockedBy("has_item", has(BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:pressure_tube"))))
+                .unlockedBy("has_item", has(BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:pressure_tube"))))
                 .save(consumer.withConditions(new ModLoadedCondition("pneumaticcraft")));
 
         //Reinforced Pressure Upgrade
@@ -425,10 +418,10 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
-                .define('A', BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:reinforced_pressure_tube")))
-                .define('B', BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:ingot_iron_compressed")))
+                .define('A', BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:reinforced_pressure_tube")))
+                .define('B', BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:ingot_iron_compressed")))
                 .group("strainers")
-                .unlockedBy("has_item", has(BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:reinforced_pressure_tube"))))
+                .unlockedBy("has_item", has(BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:reinforced_pressure_tube"))))
                 .save(consumer.withConditions(new ModLoadedCondition("pneumaticcraft")));
 
         //Advanced Pressure Upgrade
@@ -436,10 +429,10 @@ public class RoutersRecipeProvider extends RecipeProvider {
                 .pattern(" A ")
                 .pattern("ABA")
                 .pattern(" A ")
-                .define('A', BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:advanced_pressure_tube")))
-                .define('B', BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:ingot_iron_compressed")))
+                .define('A', BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:advanced_pressure_tube")))
+                .define('B', BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:ingot_iron_compressed")))
                 .group("strainers")
-                .unlockedBy("has_item", has(BuiltInRegistries.ITEM.get(ResourceLocation.parse("pneumaticcraft:advanced_pressure_tube"))))
+                .unlockedBy("has_item", has(BuiltInRegistries.ITEM.get(Identifier.parse("pneumaticcraft:advanced_pressure_tube"))))
                 .save(consumer.withConditions(new ModLoadedCondition("pneumaticcraft")));
     }
 

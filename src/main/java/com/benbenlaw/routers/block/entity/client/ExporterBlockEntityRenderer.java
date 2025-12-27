@@ -1,38 +1,6 @@
 package com.benbenlaw.routers.block.entity.client;
 
-import com.benbenlaw.routers.block.ExporterBlock;
-import com.benbenlaw.routers.block.ImporterBlock;
-import com.benbenlaw.routers.block.entity.ExporterBlockEntity;
-import com.benbenlaw.routers.util.RoutersTags;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
-import java.util.*;
-
+/*
 public class ExporterBlockEntityRenderer implements BlockEntityRenderer<ExporterBlockEntity> {
 
     public ExporterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -68,7 +36,7 @@ public class ExporterBlockEntityRenderer implements BlockEntityRenderer<Exporter
             RenderType.CompositeState.builder()
                     .setShaderState(RenderType.RENDERTYPE_BEACON_BEAM_SHADER)
                     .setTextureState(new RenderStateShard.TextureStateShard(
-                            ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png"),
+                            Identifier.withDefaultNamespace("textures/entity/beacon_beam.png"),
                             false,
                             false
                     ))
@@ -293,3 +261,5 @@ public class ExporterBlockEntityRenderer implements BlockEntityRenderer<Exporter
     }
 
 }
+
+ */

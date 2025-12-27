@@ -1,6 +1,8 @@
 package com.benbenlaw.routers.block;
 
 import com.benbenlaw.routers.Routers;
+import com.benbenlaw.routers.block.custom.ExporterBlock;
+import com.benbenlaw.routers.block.custom.ImporterBlock;
 import com.benbenlaw.routers.item.RoutersItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -13,10 +15,10 @@ import java.util.function.Supplier;
 public class RoutersBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Routers.MOD_ID);
 
-    public static final DeferredBlock<ImporterBlock> IMPORTER_BLOCK = registerBlock("importer_block",
+    public static final DeferredBlock<ImporterBlock> IMPORTER = registerBlock("importer",
             () -> new ImporterBlock(Block.Properties.of().strength(2.0f).noOcclusion()));
 
-    public static final DeferredBlock<ExporterBlock> EXPORTER_BLOCK = registerBlock("exporter_block",
+    public static final DeferredBlock<ExporterBlock> EXPORTER = registerBlock("exporter",
             () -> new ExporterBlock(Block.Properties.of().strength(2.0f).noOcclusion()));
 
 
