@@ -1,5 +1,8 @@
 Routers
 
+1.1.5
+- Fixed crashing with tag filters when component is null
+
 1.1.4
 - Tweaked beam rendering again to be more consistent in all directions
 

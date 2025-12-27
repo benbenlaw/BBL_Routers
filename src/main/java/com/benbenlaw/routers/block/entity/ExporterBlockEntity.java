@@ -992,13 +992,26 @@ public class ExporterBlockEntity extends BlockEntity implements MenuProvider, IA
             if (filter.isEmpty()) continue;
 
             if (filter.is(RoutersItems.TAG_FILTER)) {
-                // Expand tag filter
-                TagKey<Item> tagKey = TagKey.create(Registries.ITEM, Objects.requireNonNull(filter.get(RoutersDataComponents.TAG_FILTER.get())));
-                assert level != null;
+                var component = RoutersDataComponents.TAG_FILTER.get();
+                if (component == null) {
+                    continue;
+                }
+
+                ResourceLocation tagId = filter.get(component);
+                if (tagId == null) {
+                    continue;
+                }
+
+                if (level == null) continue;
+
+                TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tagId);
+
                 level.registryAccess()
                         .registryOrThrow(Registries.ITEM)
                         .getTag(tagKey)
-                        .ifPresent(tagSet -> tagSet.forEach(holder -> expanded.add(holder.value())));
+                        .ifPresent(tagSet ->
+                                tagSet.forEach(holder -> expanded.add(holder.value()))
+                        );
             } else if (filter.is(RoutersItems.MOD_FILTER)) {
                 String modId = filter.get(RoutersDataComponents.MOD_FILTER.get());
                 if (modId != null && !modId.isEmpty()) {
