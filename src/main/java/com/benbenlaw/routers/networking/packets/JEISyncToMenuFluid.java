@@ -38,7 +38,6 @@ public record JEISyncToMenuFluid(int slot, FluidStack stack) implements CustomPa
                     if (slotIndex < blockEntity.getFluidFilters().size()) {
                         blockEntity.getFluidFilters().set(slotIndex, packet.stack());
                         blockEntity.getFilters().set(slotIndex, ItemStack.EMPTY);
-                        blockEntity.getFluidFilters().set(slotIndex, FluidStack.EMPTY);
                         blockEntity.setChanged();
                     }
                 }

@@ -5,6 +5,7 @@ import com.benbenlaw.routers.networking.packets.JEISyncToMenuChemical;
 import com.benbenlaw.routers.networking.packets.JEISyncToMenuFluid;
 import com.benbenlaw.routers.screen.ExporterScreen;
 import com.benbenlaw.routers.screen.util.GhostSlot;
+import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
 import mezz.jei.api.ingredients.ITypedIngredient;
@@ -44,17 +45,27 @@ public class GhostIngredientExporterHandler implements IGhostIngredientHandler<E
 
                         if (ingredientObj instanceof ItemStack stack) {
                             PacketDistributor.sendToServer(new JEISyncToMenu(finalI, stack));
+                            ghostSlot.setFluid(FluidStack.EMPTY);
+                            if (ModList.get().isLoaded("mekanism")) {
+                                ghostSlot.setChemical(ChemicalStack.EMPTY);
+                            }
                             ghostSlot.set(stack.copyWithCount(1));
                         }
 
                         if (ingredientObj instanceof FluidStack stack) {
                             PacketDistributor.sendToServer(new JEISyncToMenuFluid(finalI, stack));
+                            ghostSlot.setItem(ItemStack.EMPTY);
+                            if (ModList.get().isLoaded("mekanism")) {
+                                ghostSlot.setChemical(ChemicalStack.EMPTY);
+                            }
                             ghostSlot.setFluid(stack);
                         }
 
                         if (ModList.get().isLoaded("mekanism")) {
                             if (ingredientObj instanceof ChemicalStack stack) {
                                 PacketDistributor.sendToServer(new JEISyncToMenuChemical(finalI, stack));
+                                ghostSlot.setItem(ItemStack.EMPTY);
+                                ghostSlot.setFluid(FluidStack.EMPTY);
                                 ghostSlot.setChemical(stack);
                             }
                         }
